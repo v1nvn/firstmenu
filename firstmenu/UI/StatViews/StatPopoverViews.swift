@@ -39,6 +39,7 @@ struct CPUPopoverView: View {
         }
         .padding()
         .frame(width: DesignSystem.Popover.Width.standard)
+        .background(.ultraThinMaterial)
     }
 }
 
@@ -83,6 +84,7 @@ struct RAMPopoverView: View {
         }
         .padding()
         .frame(width: DesignSystem.Popover.Width.wide)
+        .background(.ultraThinMaterial)
     }
 }
 
@@ -127,6 +129,7 @@ struct StoragePopoverView: View {
         }
         .padding()
         .frame(width: DesignSystem.Popover.Width.wide)
+        .background(.ultraThinMaterial)
     }
 }
 
@@ -138,12 +141,17 @@ struct WeatherPopoverView: View {
     private var conditionText: String {
         switch state.conditionCode {
         case 0: return "Clear"
-        case 1...3: return "Partly cloudy"
+        case 1: return "Mainly clear"
+        case 2: return "Partly cloudy"
+        case 3: return "Overcast"
         case 45, 48: return "Foggy"
-        case 51...67: return "Rainy"
-        case 71...77: return "Snowy"
-        case 80...82: return "Showers"
-        case 95...99: return "Thunderstorm"
+        case 51, 53, 55, 56, 57: return "Drizzle"
+        case 61, 63, 65, 66, 67: return "Rainy"
+        case 71, 73, 75, 77: return "Snowy"
+        case 85, 86: return "Snow showers"
+        case 80, 81, 82: return "Rain showers"
+        case 95: return "Thunderstorm"
+        case 96, 99: return "Thunderstorm with hail"
         default: return "Unknown"
         }
     }
@@ -173,6 +181,7 @@ struct WeatherPopoverView: View {
         }
         .padding()
         .frame(width: DesignSystem.Popover.Width.wide)
+        .background(.ultraThinMaterial)
     }
 }
 
@@ -226,15 +235,196 @@ struct NetworkPopoverView: View {
         }
         .padding()
         .frame(width: DesignSystem.Popover.Width.standard)
+        .background(.ultraThinMaterial)
     }
 }
 
-// MARK: - Apps Popover (placeholder)
+// MARK: - Apps Popover
 
 struct AppsPopoverView: View {
+    @State private var state = MenuBarState.shared
+    @State private var appManager = AppProcessManager(appLister: NSWorkspaceAppLister())
+    @State private var powerController = PowerAssertionController(powerProvider: CaffeinateWrapper())
+    @State private var showingQuitAllAlert = false
+
     var body: some View {
-        Text("Apps coming soon")
-            .padding()
+        VStack(alignment: .leading, spacing: 0) {
+            // Header
+            HStack {
+                Text("Running Apps")
+                    .font(.system(size: 13, weight: .semibold))
+                Spacer()
+                if !appManager.isLoading && !appManager.runningApps.isEmpty {
+                    Text("\(appManager.appCount)")
+                        .font(.system(size: 11, weight: .medium).monospacedDigit())
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+
+            if appManager.isLoading {
+                ProgressView()
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding()
+            } else if appManager.runningApps.isEmpty {
+                Text("No running apps")
+                    .font(.system(size: 11))
+                    .foregroundStyle(.secondary)
+                    .padding()
+            } else {
+                // Apps list
+                ForEach(appManager.runningApps) { app in
+                    AppsListRowView(app: app, onQuit: {
+                        Task { try? await appManager.quitApp(bundleIdentifier: app.bundleIdentifier ?? "") }
+                    })
+                }
+
+                // Quit All button
+                Button("Quit All Apps") {
+                    showingQuitAllAlert = true
+                }
+                .buttonStyle(.borderless)
+                .foregroundStyle(.red.opacity(0.9))
+                .font(.system(size: 11))
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 12)
+                .padding(.top, 4)
+                .padding(.bottom, 10)
+                .confirmationDialog(
+                    "Quit all running applications?",
+                    isPresented: $showingQuitAllAlert,
+                    titleVisibility: .visible
+                ) {
+                    Button("Quit All", role: .destructive) {
+                        Task { try? await appManager.quitAll() }
+                    }
+                    Button("Cancel", role: .cancel) {}
+                } message: {
+                    Text("This will close all user-facing applications but leave system apps running.")
+                }
+            }
+
+            // Caffeinate section - separated by opacity instead of divider
+            VStack(spacing: 0) {
+                HStack {
+                    Text("Keep Awake")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    Circle()
+                        .fill(powerController.isActive ? .green : Color.secondary.opacity(0.4))
+                        .frame(width: 6, height: 6)
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 10)
+                .padding(.bottom, 4)
+
+                CaffeinatePresetButton(
+                    title: "15 min",
+                    isActive: false,
+                    action: {
+                        Task { try? await powerController.keepAwake(for: 15 * 60) }
+                    }
+                )
+                CaffeinatePresetButton(
+                    title: "1 hour",
+                    isActive: false,
+                    action: {
+                        Task { try? await powerController.keepAwake(for: 60 * 60) }
+                    }
+                )
+                CaffeinatePresetButton(
+                    title: "Indefinitely",
+                    isActive: powerController.isIndefinite,
+                    action: {
+                        Task {
+                            if powerController.isIndefinite {
+                                try? await powerController.allowSleep()
+                            } else {
+                                try? await powerController.keepAwakeIndefinitely()
+                            }
+                        }
+                    }
+                )
+                if powerController.isActive {
+                    Button("Disable") {
+                        Task { try? await powerController.allowSleep() }
+                    }
+                    .buttonStyle(.borderless)
+                    .foregroundStyle(.red.opacity(0.9))
+                    .font(.system(size: 11))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                }
+            }
+            .background(Color.black.opacity(0.03))
+        }
+        .frame(width: 240)
+        .background(.ultraThinMaterial)
+        .onAppear {
+            Task { await appManager.refresh() }
+        }
+    }
+}
+
+struct CaffeinatePresetButton: View {
+    let title: String
+    let isActive: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack {
+                Text(title)
+                    .font(.system(size: 12))
+                Spacer()
+                if isActive {
+                    Image(systemName: "checkmark")
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundStyle(.green)
+                }
+            }
+        }
+        .buttonStyle(.borderless)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 5)
+    }
+}
+
+// MARK: - App List Row View
+
+struct AppsListRowView: View {
+    let app: AppProcess
+    let onQuit: () -> Void
+
+    var body: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "app.dashed")
+                .font(.system(size: 11))
+                .foregroundStyle(.secondary)
+            Text(app.name)
+                .font(.system(size: 12))
+                .lineLimit(1)
+            Spacer()
+            Button(action: onQuit) {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.system(size: 13))
+                    .foregroundStyle(.secondary.opacity(0.7))
+            }
+            .buttonStyle(.borderless)
+            .help("Quit \(app.name)")
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 4)
+        .contentShape(Rectangle())
+        .contextMenu {
+            Button("Quit", role: .destructive) {
+                onQuit()
+            }
+        }
     }
 }
 
