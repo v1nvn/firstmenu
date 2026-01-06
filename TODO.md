@@ -2,7 +2,7 @@
 
 This file tracks pending work based on [MASTER_PLAN.md](MASTER_PLAN.md).
 
-**Status:** Core implementation complete. Visual polish, integration testing, and packaging remain.
+**Status:** UI components complete. Integration tests, performance profiling, and documentation remain.
 
 ---
 
@@ -27,13 +27,20 @@ This file tracks pending work based on [MASTER_PLAN.md](MASTER_PLAN.md).
 - [x] MenuBarWindowView (popover)
 - [x] CaffeinateMenu (toggle, presets: 15min, 1hr, indefinite)
 - [x] StatsFormatter (CPU, RAM, storage, network, temperature)
+- [x] **AppsPopoverView** — Running apps with quit actions and "Quit All"
+- [x] **SettingsMenuView** — Weather refresh interval, menu bar toggles, about info
+- [x] **.ultraThinMaterial** background styling on all popovers
+- [x] **Improved weather SF Symbols** — Detailed WMO code mapping
+- [x] **Opacity hierarchy** — Section separation via subtle backgrounds
 
 ### App Entry Point
 - [x] FirstMenuApp.swift with AppDelegate
 - [x] Timer-based updates (1s stats, 15min weather)
+- [x] Menu bar extras for CPU, RAM, Storage, Weather, Network, Apps
+- [x] Settings scene wired to SettingsMenuView
 
 ### Testing
-- [x] Domain tests: 25 tests passing
+- [x] Domain tests: 46 tests passing
 - [x] Infrastructure tests: 21 tests passing
 - [x] Mock providers for all infrastructure
 - [x] Test coverage for all use cases
@@ -48,39 +55,20 @@ This file tracks pending work based on [MASTER_PLAN.md](MASTER_PLAN.md).
 
 ### High Priority
 
-#### UI Components
-- [ ] **AppListMenu.swift** — Running applications menu
-  - List of currently running user-facing apps
-  - Per-app quit action
-  - "Quit All" with confirmation
-  - Filter out menu bar apps and system apps
-
-- [ ] **SettingsMenu.swift** — Settings (if needed)
-  - Weather refresh interval
-  - Toggle which stats appear in menu bar
-  - About / version info
-
-#### Visual Polish
-- [ ] Menu bar icon design (needs asset catalog entry)
-- [ ] Caffeinate state indicator in menu bar icon
-- [ ] `.ultraThinMaterial` background styling
-- [ ] Proper SF Symbols for weather conditions
-- [ ] Monospaced digit alignment for stats
-- [ ] Opacity hierarchy instead of separators
-
-#### Integration
-- [ ] Wire AppListMenu to MenuBarWindowView
-- [ ] Wire SettingsMenu to MenuBarWindowView
-- [ ] Verify TimelineView update strategy
-
-### Medium Priority
-
 #### Testing
 - [ ] **IntegrationTests** directory (empty)
   - End-to-end app flow tests
   - Menu interaction tests
 - [ ] Increase test coverage to 100% for Domain layer
 - [ ] UI tests for menu interactions
+- [ ] Unit tests for UI components (AppsPopoverView, SettingsMenuView)
+
+#### Error Handling
+- [ ] Graceful degradation when weather API fails
+- [ ] User-facing error messages (if any)
+- [ ] Crash reporting strategy (decide if needed)
+
+### Medium Priority
 
 #### Performance
 - [ ] Profile RAM usage (target: < 20 MB)
@@ -88,10 +76,9 @@ This file tracks pending work based on [MASTER_PLAN.md](MASTER_PLAN.md).
 - [ ] Optimize wakeups (target: ≤ 1/sec)
 - [ ] Binary size check (target: < 10 MB)
 
-#### Error Handling
-- [ ] Graceful degradation when weather API fails
-- [ ] User-facing error messages (if any)
-- [ ] Crash reporting strategy (decide if needed)
+#### Visual Polish (Remaining)
+- [ ] Menu bar icon design (needs asset catalog entry)
+- [ ] Caffeinate state indicator in menu bar icon
 
 ### Low Priority
 
@@ -140,11 +127,11 @@ make clean        # Clean build artifacts
 ```
 
 ### Test Stats
-- **Domain Tests:** 25 passing
+- **Domain Tests:** 46 passing
 - **Infrastructure Tests:** 21 passing
-- **Total:** 46 tests, 0 failures
+- **Total:** 67 tests, 0 failures
 
 ### File Count
-- **Source files:** ~30
+- **Source files:** ~35
 - **Test files:** 12
-- **Lines of code:** ~2,500 (estimate)
+- **Lines of code:** ~3,200 (estimate)
