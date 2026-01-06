@@ -16,6 +16,7 @@ CPU 12% • RAM 9.4G • SSD 62% • ☀︎ 28° • ↓ 32 ↑ 8
 - **Storage** — System disk usage percentage
 - **Weather** — Current temperature with SF Symbol icon
 - **Network** — Download / upload speeds
+- **Apps** — Running applications with quick quit actions
 
 ### Menu Actions
 
@@ -23,11 +24,17 @@ CPU 12% • RAM 9.4G • SSD 62% • ☀︎ 28° • ↓ 32 ↑ 8
 - List of user-facing apps
 - Quit individual apps
 - Quit All (with confirmation)
+- Keep Awake controls integrated
 
 **Caffeinate Utility**
 - Toggle "Keep Awake"
 - Quick presets: 15 min, 1 hour, Indefinite
-- Status reflected in menu bar icon
+- Status indicator (green dot when active)
+
+**Settings**
+- Weather refresh interval (5/15/30/60 min)
+- Toggle menu bar items visibility
+- About / version info
 
 ## Installation
 
@@ -61,8 +68,8 @@ firstmenu follows strict TDD with a CLI-first workflow.
 
 ### Prerequisites
 
-- macOS 15.0+
-- Xcode 16.0+
+- macOS 26.2+ (Sequoia)
+- Xcode 17.2+
 - Swift 6.0+
 
 ### Makefile Commands
@@ -70,10 +77,12 @@ firstmenu follows strict TDD with a CLI-first workflow.
 ```bash
 make pulse        # Run full test suite
 make probe        # Fast domain tests only (TDD loop)
+make test-stats   # Show test statistics
 make lint         # SwiftLint check
 make lint-fix     # Auto-fix SwiftLint issues
 make format       # Format code with SwiftLint
 make clean        # Clean build artifacts
+make run          # Build and launch the app
 ```
 
 ### Architecture
@@ -136,14 +145,18 @@ make pulse
 # Run domain tests only (fast feedback for TDD)
 make probe
 
+# Show test statistics
+make test-stats
+
 # Run specific test
 xcodebuild test -scheme firstmenu -only-testing:firstmenuTests/StatsSamplerTests
 ```
 
 **Current Coverage:**
-- Domain: 100%
-- Infrastructure: ~90%
-- UI: Manual testing
+- **96 tests** across 16 test files
+- Domain: 25 tests (100%)
+- Infrastructure: 64 tests (~95%)
+- Integration: 7 tests
 
 ## Design Principles
 
@@ -175,14 +188,28 @@ xcodebuild test -scheme firstmenu -only-testing:firstmenuTests/StatsSamplerTests
 
 See [TODO.md](TODO.md) for detailed tracking.
 
+### Completed ✅
 - [x] Core infrastructure (CPU, RAM, Storage, Network)
 - [x] Weather integration (Open-Meteo, no API key)
-- [x] Caffeinate wrapper
-- [x] Domain tests (46 tests passing)
-- [ ] App list menu UI
-- [ ] Visual polish
-- [ ] Performance optimization
-- [ ] Release build
+- [x] Caffeinate wrapper with preset durations
+- [x] AppsPopoverView with running apps list
+- [x] SettingsMenuView with configuration options
+- [x] Domain tests (25 tests)
+- [x] Infrastructure tests (64 tests)
+- [x] Integration tests (7 tests)
+- [x] Graceful error handling for all providers
+- [x] `.ultraThinMaterial` background styling
+
+### In Progress 🚧
+- [ ] Performance profiling and optimization
+- [ ] Menu bar icon design
+- [ ] In-code documentation
+
+### Future 📋
+- [ ] Code signing setup
+- [ ] App Store assets
+- [ ] Homebrew formula
+- [ ] Custom weather location
 
 ## Contributing
 
