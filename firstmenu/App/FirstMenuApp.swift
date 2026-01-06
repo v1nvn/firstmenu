@@ -21,7 +21,7 @@ struct FirstMenuApp: App {
         AppsMenuBarExtra()
 
         Settings {
-            EmptyView()
+            SettingsMenuView()
         }
     }
 }
