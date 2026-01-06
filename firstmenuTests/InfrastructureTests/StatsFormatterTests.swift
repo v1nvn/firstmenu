@@ -69,4 +69,36 @@ final class StatsFormatterTests: XCTestCase {
         XCTAssertEqual(StatsFormatter.formatTemperature(30.2), "30°")
         XCTAssertEqual(StatsFormatter.formatTemperature(-5), "-5°")
     }
+
+    // MARK: - Edge Cases
+
+    func testFormatPercentage_EdgeCases() {
+        XCTAssertEqual(StatsFormatter.formatPercentage(-1), "0%")
+        XCTAssertEqual(StatsFormatter.formatPercentage(100.5), "100%")
+        XCTAssertEqual(StatsFormatter.formatPercentage(50), "50%")
+    }
+
+    func testFormatBytes_LargeValues() {
+        XCTAssertEqual(StatsFormatter.formatBytes(1_099_511_627_776), "1.0 TB")      // 1 TB
+        XCTAssertEqual(StatsFormatter.formatBytes(1_125_899_906_842_624), "1.0 PB")   // 1 PB
+    }
+
+    func testFormatBytes_Precision() {
+        XCTAssertEqual(StatsFormatter.formatBytes(1_234_567), "1.2 MB")
+        XCTAssertEqual(StatsFormatter.formatBytes(1_294_567), "1.2 MB")
+        XCTAssertEqual(StatsFormatter.formatBytes(1_600_000), "1.5 MB")
+    }
+
+    func testFormatNetworkSpeed_Precision() {
+        XCTAssertEqual(StatsFormatter.formatNetworkSpeed(1_300_000), "1.2 MB/s")
+        XCTAssertEqual(StatsFormatter.formatNetworkSpeed(1_600_000), "1.5 MB/s")
+        XCTAssertEqual(StatsFormatter.formatNetworkSpeed(1_990_000), "1.9 MB/s")
+    }
+
+    func testFormatTemperature_EdgeCases() {
+        XCTAssertEqual(StatsFormatter.formatTemperature(-100), "-100°")
+        XCTAssertEqual(StatsFormatter.formatTemperature(100), "100°")
+        XCTAssertEqual(StatsFormatter.formatTemperature(0.4), "0°")
+        XCTAssertEqual(StatsFormatter.formatTemperature(0.6), "1°")
+    }
 }

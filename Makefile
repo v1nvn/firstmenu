@@ -66,6 +66,18 @@ probe:
 	@echo "Running domain tests..."
 	xcodebuild test -scheme firstmenu -destination 'platform=macOS' -only-testing:firstmenuTests/DomainTests
 
+# Show test statistics
+test-stats:
+	@echo "Test Statistics:"
+	@echo "=================="
+	@echo "Total test functions: $$(grep -r 'func test' firstmenuTests --include='*.swift' | wc -l | tr -d ' ')"
+	@echo "Test files: $$(find firstmenuTests -name '*.swift' | wc -l | tr -d ' ')"
+	@echo ""
+	@echo "Test breakdown:"
+	@echo "  Domain: $$(grep -r 'func test' firstmenuTests/DomainTests --include='*.swift' | wc -l | tr -d ' ') tests"
+	@echo "  Infrastructure: $$(grep -r 'func test' firstmenuTests/InfrastructureTests --include='*.swift' | wc -l | tr -d ' ') tests"
+	@echo "  Integration: $$(grep -r 'func test' firstmenuTests/IntegrationTests --include='*.swift' | wc -l | tr -d ' ') tests"
+
 # Auto-run lint and tests on file changes
 watch:
 	@echo "Watching for changes..."
@@ -89,7 +101,9 @@ help:
 	@echo "  make lint-fix  - Auto-fix SwiftLint issues"
 	@echo "  make format    - Format code with SwiftLint"
 	@echo "  make test      - Run full test suite (make pulse)"
+	@echo "  make pulse     - Run full test suite"
 	@echo "  make probe     - Run domain tests only (fast TDD loop)"
+	@echo "  make test-stats - Show test statistics"
 	@echo "  make watch     - Auto-run lint and tests on file changes"
 	@echo "  make run       - Build and launch the app"
 	@echo "  make help      - Show this help message"
