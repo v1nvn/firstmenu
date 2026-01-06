@@ -22,14 +22,14 @@ final class WeatherSnapshotTests: XCTestCase {
     }
 
     func testSFSymbolNameForPartlyCloudy() {
-        XCTAssertEqual(WeatherSnapshot(temperature: 0, conditionCode: 1).sfSymbolName, "cloud.sun.fill")
+        XCTAssertEqual(WeatherSnapshot(temperature: 0, conditionCode: 1).sfSymbolName, "sun.max.fill")
         XCTAssertEqual(WeatherSnapshot(temperature: 0, conditionCode: 2).sfSymbolName, "cloud.sun.fill")
-        XCTAssertEqual(WeatherSnapshot(temperature: 0, conditionCode: 3).sfSymbolName, "cloud.sun.fill")
+        XCTAssertEqual(WeatherSnapshot(temperature: 0, conditionCode: 3).sfSymbolName, "cloud.fill")
     }
 
     func testSFSymbolNameForFog() {
-        XCTAssertEqual(WeatherSnapshot(temperature: 0, conditionCode: 45).sfSymbolName, "cloud.fill")
-        XCTAssertEqual(WeatherSnapshot(temperature: 0, conditionCode: 48).sfSymbolName, "cloud.fill")
+        XCTAssertEqual(WeatherSnapshot(temperature: 0, conditionCode: 45).sfSymbolName, "cloud.fog.fill")
+        XCTAssertEqual(WeatherSnapshot(temperature: 0, conditionCode: 48).sfSymbolName, "cloud.fog.fill")
     }
 
     func testSFSymbolNameForDrizzle() {
@@ -58,7 +58,7 @@ final class WeatherSnapshotTests: XCTestCase {
     }
 
     func testSFSymbolNameForThunderstorm() {
-        XCTAssertEqual(WeatherSnapshot(temperature: 0, conditionCode: 95).sfSymbolName, "cloud.bolt.fill")
+        XCTAssertEqual(WeatherSnapshot(temperature: 0, conditionCode: 95).sfSymbolName, "cloud.bolt.rain.fill")
         XCTAssertEqual(WeatherSnapshot(temperature: 0, conditionCode: 96).sfSymbolName, "cloud.bolt.fill")
         XCTAssertEqual(WeatherSnapshot(temperature: 0, conditionCode: 99).sfSymbolName, "cloud.bolt.fill")
     }
