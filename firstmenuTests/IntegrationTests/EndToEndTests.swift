@@ -25,7 +25,7 @@ final class EndToEndTests: XCTestCase {
         )
 
         // First sampling establishes baseline for network
-        try await sampler.sample()
+        await sampler.sample()
 
         let snapshot1 = sampler.currentSnapshot
         XCTAssertNotNil(snapshot1)
@@ -51,7 +51,7 @@ final class EndToEndTests: XCTestCase {
 
         // Wait and sample again for network delta
         try await Task.sleep(nanoseconds: 200_000_000) // 0.2 seconds
-        try await sampler.sample()
+        await sampler.sample()
 
         let snapshot2 = sampler.currentSnapshot
         XCTAssertNotNil(snapshot2)
@@ -163,7 +163,7 @@ final class EndToEndTests: XCTestCase {
         let weatherSampler = WeatherSampler(weatherProvider: weatherClient)
 
         // Sample both stats and weather
-        try await statsSampler.sample()
+        await statsSampler.sample()
         await weatherSampler.sample()
 
         let stats = statsSampler.currentSnapshot
@@ -195,7 +195,7 @@ final class EndToEndTests: XCTestCase {
             networkProvider: InterfaceNetworkReader()
         )
 
-        try await sampler.sample()
+        await sampler.sample()
 
         let snapshot = sampler.currentSnapshot
         XCTAssertNotNil(snapshot)

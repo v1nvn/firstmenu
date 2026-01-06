@@ -28,7 +28,7 @@ final class StatsSamplerTests: XCTestCase {
             networkProvider: networkProvider
         )
 
-        try await sampler.sample()
+        await sampler.sample()
 
         let snapshot = await sampler.currentSnapshot
         let unwrappedSnapshot = try XCTUnwrap(snapshot)
@@ -56,15 +56,17 @@ final class StatsSamplerTests: XCTestCase {
             networkProvider: networkProvider
         )
 
-        do {
-            try await sampler.sample()
-            XCTFail("Should have thrown an error")
-        } catch {
-            // Expected
-        }
+        // sample() now handles errors gracefully instead of throwing
+        await sampler.sample()
 
+        // Snapshot should still be created with default value for CPU
         let snapshot = await sampler.currentSnapshot
-        XCTAssertNil(snapshot)
+        XCTAssertNotNil(snapshot)
+
+        // CPU should be 0 (default when error occurs)
+        if let s = snapshot {
+            XCTAssertEqual(s.cpuPercentage, 0)
+        }
     }
 
     func testRamPercentageCalculation() async throws {
@@ -82,7 +84,7 @@ final class StatsSamplerTests: XCTestCase {
             networkProvider: networkProvider
         )
 
-        try await sampler.sample()
+        await sampler.sample()
 
         let snapshot = await sampler.currentSnapshot
         let unwrappedSnapshot = try XCTUnwrap(snapshot)
@@ -104,7 +106,7 @@ final class StatsSamplerTests: XCTestCase {
             networkProvider: networkProvider
         )
 
-        try await sampler.sample()
+        await sampler.sample()
 
         let snapshot = await sampler.currentSnapshot
         let unwrappedSnapshot = try XCTUnwrap(snapshot)
@@ -127,7 +129,7 @@ final class StatsSamplerTests: XCTestCase {
         )
 
         // First call should fetch from provider
-        try await sampler.sample()
+        await sampler.sample()
 
         var snapshot = await sampler.currentSnapshot
         var unwrappedSnapshot = try XCTUnwrap(snapshot)
@@ -137,7 +139,7 @@ final class StatsSamplerTests: XCTestCase {
         await storageProvider.setStorage(used: 200_000_000_000, total: 500_000_000_000)
 
         // Immediately sampling again should use cached value
-        try await sampler.sample()
+        await sampler.sample()
 
         snapshot = await sampler.currentSnapshot
         unwrappedSnapshot = try XCTUnwrap(snapshot)
@@ -145,7 +147,7 @@ final class StatsSamplerTests: XCTestCase {
 
         // Invalidate cache and sample again
         await sampler.invalidateStorageCache()
-        try await sampler.sample()
+        await sampler.sample()
 
         snapshot = await sampler.currentSnapshot
         unwrappedSnapshot = try XCTUnwrap(snapshot)

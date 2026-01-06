@@ -37,19 +37,35 @@ public final class StatsSampler {
     }
 
     /// Samples all system statistics and produces a combined snapshot.
-    public func sample() async throws {
+    /// This method handles partial failures gracefully - if any provider fails,
+    /// it will use cached values or defaults where available.
+    public func sample() async {
         isSampling = true
         defer { isSampling = false }
 
-        // Sample CPU, RAM, and Network every time
-        async let cpu = cpuProvider.cpuPercentage()
-        async let ram = ramProvider.ramUsage()
-        async let network = networkProvider.networkSpeed()
+        // Sample CPU, RAM, and Network every time with error handling
+        let cpuValue = await (try? cpuProvider.cpuPercentage()) ?? currentSnapshot?.cpuPercentage ?? 0
+        let ramResult = await (try? ramProvider.ramUsage())
+        let ramValue: (used: Int64, total: Int64)
+        if let ram = ramResult {
+            ramValue = ram
+        } else if let snapshot = currentSnapshot {
+            ramValue = (used: snapshot.ramUsed, total: snapshot.ramTotal)
+        } else {
+            ramValue = (used: 0, total: 1)
+        }
+        let networkResult = await (try? networkProvider.networkSpeed())
+        let networkValue: (downloadBPS: Int64, uploadBPS: Int64)
+        if let network = networkResult {
+            networkValue = (downloadBPS: network.downloadBPS, uploadBPS: network.uploadBPS)
+        } else if let snapshot = currentSnapshot {
+            networkValue = (downloadBPS: snapshot.networkDownloadBPS, uploadBPS: snapshot.networkUploadBPS)
+        } else {
+            networkValue = (downloadBPS: 0, uploadBPS: 0)
+        }
 
-        // Storage is cached
+        // Storage is cached with fallback
         let storage = await getStorageUsage()
-
-        let (cpuValue, ramValue, networkValue) = await (try cpu, try ram, try network)
 
         currentSnapshot = StatsSnapshot(
             cpuPercentage: cpuValue,
