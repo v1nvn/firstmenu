@@ -13,208 +13,121 @@ struct FirstMenuApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     var body: some Scene {
-        // No scenes needed for menu bar only app
+        CPUMenuBarExtra()
+        RAMMenuBarExtra()
+        StorageMenuBarExtra()
+        WeatherMenuBarExtra()
+        NetworkMenuBarExtra()
+        AppsMenuBarExtra()
+
         Settings {
             EmptyView()
         }
     }
 }
 
+// MARK: - Menu Bar Extra Scenes
+
+struct CPUMenuBarExtra: Scene {
+    var body: some Scene {
+        MenuBarExtra("CPU", systemImage: "cpu") {
+            CPUPopoverView()
+        }
+        .menuBarExtraStyle(.window)
+    }
+}
+
+struct RAMMenuBarExtra: Scene {
+    var body: some Scene {
+        MenuBarExtra("RAM", systemImage: "memorychip") {
+            RAMPopoverView()
+        }
+        .menuBarExtraStyle(.window)
+    }
+}
+
+struct StorageMenuBarExtra: Scene {
+    var body: some Scene {
+        MenuBarExtra("Storage", systemImage: "internaldrive") {
+            StoragePopoverView()
+        }
+        .menuBarExtraStyle(.window)
+    }
+}
+
+struct WeatherMenuBarExtra: Scene {
+    var body: some Scene {
+        MenuBarExtra("Weather", systemImage: "cloud.sun") {
+            WeatherPopoverView()
+        }
+        .menuBarExtraStyle(.window)
+    }
+}
+
+struct NetworkMenuBarExtra: Scene {
+    var body: some Scene {
+        MenuBarExtra("Network", systemImage: "network") {
+            NetworkPopoverView()
+        }
+        .menuBarExtraStyle(.window)
+    }
+}
+
+struct AppsMenuBarExtra: Scene {
+    var body: some Scene {
+        MenuBarExtra("Apps", systemImage: "app.dashed") {
+            AppsPopoverView()
+        }
+        .menuBarExtraStyle(.window)
+    }
+}
+
+// MARK: - App Delegate
+
 @MainActor
 class AppDelegate: NSObject, NSApplicationDelegate {
-    var statusItem: NSStatusItem?
-    var popover: NSPopover?
-    var statsSampler: StatsSampler?
-    var weatherSampler: WeatherSampler?
-    var appManager: AppProcessManager?
     var powerController: PowerAssertionController?
-    var updateTimer: Timer?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Ensure app is menu bar only - no dock icon
         NSApp.setActivationPolicy(.accessory)
 
-        // Setup status item
-        setupStatusBar()
-
         // Initialize dependencies
         setupDependencies()
 
-        // Start periodic updates
-        startPeriodicUpdates()
-
-        // Initial sampling
-        Task {
-            await initialSample()
-        }
-    }
-
-    private func setupStatusBar() {
-        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-
-        if let button = statusItem?.button {
-            button.action = #selector(togglePopover)
-            button.target = self
-        }
+        // Start updating menu bar state
+        MenuBarState.shared.startUpdating()
     }
 
     private func setupDependencies() {
-        // Infrastructure layer
         let cpuReader = MachCPUReader()
         let ramReader = MachRAMReader()
         let storageReader = FileSystemStorageReader()
         let networkReader = InterfaceNetworkReader()
-        let weatherClient: OpenMeteoWeatherClient
-        let appLister = NSWorkspaceAppLister()
-        let powerWrapper = CaffeinateWrapper()
 
+        let weatherClient: OpenMeteoWeatherClient
         do {
             weatherClient = try OpenMeteoWeatherClient()
         } catch {
-            // If weather client fails to initialize, we'll run without it
             fatalError("Failed to initialize weather client: \(error)")
         }
 
-        // Domain use cases
-        statsSampler = StatsSampler(
+        let powerWrapper = CaffeinateWrapper()
+
+        let statsSampler = StatsSampler(
             cpuProvider: cpuReader,
             ramProvider: ramReader,
             storageProvider: storageReader,
             networkProvider: networkReader
         )
 
-        weatherSampler = WeatherSampler(weatherProvider: weatherClient)
-        appManager = AppProcessManager(appLister: appLister)
+        let weatherSampler = WeatherSampler(weatherProvider: weatherClient)
+
+        MenuBarState.shared.setSamplers(stats: statsSampler, weather: weatherSampler)
         powerController = PowerAssertionController(powerProvider: powerWrapper)
     }
 
-    private func startPeriodicUpdates() {
-        // Update every second for stats
-        updateTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            Task { [weak self] in
-                await self?.updateStats()
-            }
-        }
-
-        // Weather updates less frequently - every 15 minutes
-        Timer.scheduledTimer(withTimeInterval: 15 * 60, repeats: true) { [weak self] _ in
-            Task { [weak self] in
-                await self?.weatherSampler?.sample()
-                await self?.updateMenuBarText()
-            }
-        }
-    }
-
-    private func initialSample() async {
-        try? await statsSampler?.sample()
-        await weatherSampler?.sample()
-        updateMenuBarText()
-    }
-
-    private func updateStats() async {
-        try? await statsSampler?.sample()
-        updateMenuBarText()
-    }
-
-    private func updateMenuBarText() {
-        guard let snapshot = statsSampler?.currentSnapshot,
-              let weather = weatherSampler?.currentWeather else {
-            statusItem?.button?.title = "..."
-            return
-        }
-
-        let labelView = MenuBarLabelView(
-            statsSnapshot: snapshot,
-            weatherSnapshot: weather
-        )
-
-        // Create image from SwiftUI view
-        let renderer = ImageRenderer(content: labelView)
-        renderer.scale = 2.0  // Retina
-
-        if let nsImage = renderer.nsImage {
-            statusItem?.button?.image = nsImage
-            statusItem?.button?.title = ""
-        } else {
-            // Fallback to text rendering
-            statusItem?.button?.image = nil
-            statusItem?.button?.title = formatMenuBarText(snapshot: snapshot, weather: weather)
-        }
-    }
-
-    private func formatMenuBarText(snapshot: StatsSnapshot, weather: WeatherSnapshot) -> String {
-        var parts: [String] = []
-
-        parts.append(String(format: "CPU %.0f%%", snapshot.cpuPercentage))
-        parts.append(String(format: "RAM %.1fG", Double(snapshot.ramUsed) / 1_073_741_824))
-        parts.append(String(format: "SSD %.0f%%", snapshot.storagePercentage))
-        parts.append("☀︎")
-        parts.append(String(format: "%.0f°", weather.temperature))
-
-        if snapshot.networkDownloadBPS > 0 || snapshot.networkUploadBPS > 0 {
-            parts.append("↓ \(formatSpeed(snapshot.networkDownloadBPS))")
-            parts.append("↑ \(formatSpeed(snapshot.networkUploadBPS))")
-        }
-
-        return parts.joined(separator: " • ")
-    }
-
-    private func formatSpeed(_ bps: Int64) -> String {
-        let mbps = Double(bps) / (1024 * 1024)
-        let kbps = Double(bps) / 1024
-
-        if mbps >= 1 {
-            return String(format: "%.0fM", mbps)
-        } else if kbps >= 1 {
-            return String(format: "%.0fK", kbps)
-        }
-        return "0"
-    }
-
-    @objc private func togglePopover() {
-        if let popover = popover, popover.isShown {
-            closePopover()
-        } else {
-            showPopover()
-        }
-    }
-
-    private func showPopover() {
-        guard let statusButton = statusItem?.button,
-              let appManager = appManager,
-              let powerController = powerController else {
-            return
-        }
-
-        // Refresh app list when showing popover
-        Task { await appManager.refresh() }
-
-        if popover == nil {
-            popover = NSPopover()
-            popover?.behavior = .transient
-            popover?.contentSize = NSSize(width: 280, height: 400)
-        }
-
-        popover?.contentViewController = NSHostingController(
-            rootView: MenuBarWindowView(
-                appManager: appManager,
-                powerController: powerController
-            )
-        )
-
-        popover?.show(relativeTo: statusButton.bounds, of: statusButton, preferredEdge: .minY)
-
-        // Activate app to ensure keyboard navigation works
-        NSApp.activate(ignoringOtherApps: true)
-    }
-
-    private func closePopover() {
-        popover?.performClose(nil)
-    }
-
     func applicationWillTerminate(_ notification: Notification) {
-        updateTimer?.invalidate()
-        // Deactivate caffeinate if active
         Task { [weak self] in
             try? await self?.powerController?.allowSleep()
         }
