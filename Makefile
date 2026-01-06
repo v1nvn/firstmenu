@@ -1,0 +1,95 @@
+# firstmenu Makefile
+# CLI-first development interface
+
+.PHONY: all build clean test lint lint-fix format probe watch run help setup-lint
+
+# SwiftLint cache location
+SWIFTLINT_CACHE=$(HOME)/Library/Caches/com.firstmenu.SwiftLint
+SWIFTLINT_BIN=$(SWIFTLINT_CACHE)/swiftlint
+
+# Default target - includes lint check
+all: lint build
+
+# Setup SwiftLint via SPM (run once)
+setup-lint:
+	@echo "Setting up SwiftLint via SPM..."
+	@bash Scripts/setup-swiftlint.sh
+
+# Build the app
+build:
+	@echo "Building firstmenu..."
+	xcodebuild -scheme firstmenu -configuration Debug build
+
+# Clean build artifacts
+clean:
+	@echo "Cleaning derived data..."
+	xcodebuild -scheme firstmenu clean
+	rm -rf ~/Library/Developer/Xcode/DerivedData/firstmenu-*
+
+# Run SwiftLint (uses SPM-cached binary)
+lint:
+	@echo "Running SwiftLint..."
+	@if [ -f "$(SWIFTLINT_BIN)" ]; then \
+		$(SWIFTLINT_BIN) lint --strict; \
+	else \
+		echo "SwiftLint not found. Run: make setup-lint"; \
+		exit 1; \
+	fi
+
+# Auto-fix SwiftLint issues
+lint-fix:
+	@echo "Auto-fixing SwiftLint issues..."
+	@if [ -f "$(SWIFTLINT_BIN)" ]; then \
+		$(SWIFTLINT_BIN) --fix --strict; \
+	else \
+		echo "SwiftLint not found. Run: make setup-lint"; \
+		exit 1; \
+	fi
+
+# Format code with SwiftLint
+format:
+	@echo "Formatting code..."
+	@if [ -f "$(SWIFTLINT_BIN)" ]; then \
+		$(SWIFTLINT_BIN) --fix; \
+	else \
+		echo "SwiftLint not found. Run: make setup-lint"; \
+		exit 1; \
+	fi
+
+# Run full test suite (alias for pulse)
+test pulse:
+	@echo "Running full test suite..."
+	xcodebuild test -scheme firstmenu -destination 'platform=macOS'
+
+# Run tests quickly (domain only - fast TDD loop)
+probe:
+	@echo "Running domain tests..."
+	xcodebuild test -scheme firstmenu -destination 'platform=macOS' -only-testing:firstmenuTests/DomainTests
+
+# Auto-run lint and tests on file changes
+watch:
+	@echo "Watching for changes..."
+	@which entr > /dev/null || (echo "entr not installed. Run: brew install entr" && exit 1)
+	@find firstmenu -name "*.swift" | entr -c sh -c 'make lint && make test'
+
+# Run the app
+run:
+	@echo "Launching firstmenu..."
+	xcodebuild -scheme firstmenu build && open ~/Library/Developer/Xcode/DerivedData/firstmenu-*/Build/Products/Debug/firstmenu.app
+
+# Show help
+help:
+	@echo "firstmenu - Makefile targets"
+	@echo ""
+	@echo "  make all       - Lint and build (default)"
+	@echo "  make build     - Build the app"
+	@echo "  make clean     - Clean build artifacts"
+	@echo "  make setup-lint - Setup SwiftLint via SPM (run once)"
+	@echo "  make lint      - Run SwiftLint checks"
+	@echo "  make lint-fix  - Auto-fix SwiftLint issues"
+	@echo "  make format    - Format code with SwiftLint"
+	@echo "  make test      - Run full test suite (make pulse)"
+	@echo "  make probe     - Run domain tests only (fast TDD loop)"
+	@echo "  make watch     - Auto-run lint and tests on file changes"
+	@echo "  make run       - Build and launch the app"
+	@echo "  make help      - Show this help message"

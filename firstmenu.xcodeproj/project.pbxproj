@@ -71,6 +71,26 @@
 		};
 /* End PBXFrameworksBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		443C6D832F0CF3A0000AF0560 /* SwiftLint */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			shellPath = /bin/sh;
+			shellScript = "# SwiftLint - runs from cached SPM build\nSWIFTLINT_CACHE=\"$HOME/Library/Caches/com.firstmenu.SwiftLint\"\nSWIFTLINT_BIN=\"$SWIFTLINT_CACHE/swiftlint\"\n\nif [ -f \"$SWIFTLINT_BIN\" ]; then\n  cd \"$SRCROOT\"\n  \"$SWIFTLINT_BIN\" lint --strict 2>/dev/null || \"$SWIFTLINT_BIN\" lint\nelse\n  echo \"warning: SwiftLint not found. Run: bash Scripts/setup-swiftlint.sh\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXGroup section */
 		443C6D4D2F0CDA2600AF0560 = {
 			isa = PBXGroup;
@@ -99,6 +119,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 443C6D772F0CDA2700AF0560 /* Build configuration list for PBXNativeTarget "firstmenu" */;
 			buildPhases = (
+				443C6D832F0CF3A0000AF0560 /* SwiftLint */,
 				443C6D522F0CDA2600AF0560 /* Sources */,
 				443C6D532F0CDA2600AF0560 /* Frameworks */,
 				443C6D542F0CDA2600AF0560 /* Resources */,
