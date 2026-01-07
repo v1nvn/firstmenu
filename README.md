@@ -153,9 +153,10 @@ xcodebuild test -scheme firstmenu -only-testing:firstmenuTests/StatsSamplerTests
 ```
 
 **Current Coverage:**
-- **96 tests** across 16 test files
+- **195 tests** across 22 test files
 - Domain: 25 tests (100%)
-- Infrastructure: 64 tests (~95%)
+- Infrastructure: 100 tests (~95%)
+- UI: 63 tests
 - Integration: 7 tests
 
 ## Design Principles

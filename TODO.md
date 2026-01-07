@@ -2,7 +2,7 @@
 
 This file tracks pending work based on [MASTER_PLAN.md](MASTER_PLAN.md).
 
-**Status:** Feature-complete. Testing and documentation mostly done. Performance profiling and release prep remain.
+**Status:** Feature-complete. Testing complete. Documentation and release prep remain.
 
 ---
 
@@ -40,9 +40,10 @@ This file tracks pending work based on [MASTER_PLAN.md](MASTER_PLAN.md).
 - [x] Settings scene wired to SettingsMenuView
 
 ### Testing
-- [x] **96 tests** across 16 test files
+- [x] **195 tests** across 22 test files
 - [x] Domain tests: 25 tests (100% coverage)
-- [x] Infrastructure tests: 64 tests (~95% coverage)
+- [x] Infrastructure tests: 100 tests (~95% coverage)
+- [x] UI tests: 63 tests
 - [x] Integration tests: 7 tests
 - [x] Mock providers for all infrastructure
 - [x] Graceful error handling tests
@@ -122,13 +123,14 @@ make run          # Build and launch the app
 ```
 
 ### Test Stats
-- **Total Tests:** 96
+- **Total Tests:** 195
 - **Domain:** 25 tests (100% coverage)
-- **Infrastructure:** 64 tests (~95% coverage)
+- **Infrastructure:** 100 tests (~95% coverage)
+- **UI:** 63 tests
 - **Integration:** 7 tests
-- **Test Files:** 16
+- **Test Files:** 22
 
 ### File Count
-- **Source files:** ~35
-- **Test files:** 16
-- **Lines of code:** ~3,500 (estimate)
+- **Source files:** ~40
+- **Test files:** 22
+- **Lines of code:** ~5,500 (estimate)
