@@ -16,6 +16,13 @@ struct SettingsMenuView: View {
     @AppStorage("showWeatherInMenuBar") private var showWeatherInMenuBar: Bool = true
     @AppStorage("showNetworkInMenuBar") private var showNetworkInMenuBar: Bool = true
 
+    // Display modes
+    @AppStorage("cpuDisplayMode") private var cpuDisplayMode: String = MenuBarDisplayMode.value.rawValue
+    @AppStorage("ramDisplayMode") private var ramDisplayMode: String = MenuBarDisplayMode.value.rawValue
+    @AppStorage("storageDisplayMode") private var storageDisplayMode: String = MenuBarDisplayMode.value.rawValue
+    @AppStorage("weatherDisplayMode") private var weatherDisplayMode: String = MenuBarDisplayMode.both.rawValue
+    @AppStorage("networkDisplayMode") private var networkDisplayMode: String = MenuBarDisplayMode.value.rawValue
+
     private let version: String = {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
     }()
@@ -65,7 +72,7 @@ struct SettingsMenuView: View {
             }
             .background(Color.black.opacity(0.03))
 
-            // Menu Bar Section
+            // Menu Bar Items Visibility Section
             VStack(spacing: 0) {
                 Text("Menu Bar Items")
                     .font(.system(size: 12, weight: .semibold))
@@ -102,6 +109,48 @@ struct SettingsMenuView: View {
                     title: "Network",
                     icon: "network",
                     isOn: $showNetworkInMenuBar
+                )
+                .padding(.bottom, 6)
+            }
+            .background(Color.black.opacity(0.03))
+
+            // Display Mode Section
+            VStack(spacing: 0) {
+                Text("Display Mode")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 10)
+                    .padding(.bottom, 4)
+
+                DisplayModePicker(
+                    title: "CPU",
+                    icon: "cpu",
+                    selection: $cpuDisplayMode
+                )
+
+                DisplayModePicker(
+                    title: "Memory",
+                    icon: "memorychip",
+                    selection: $ramDisplayMode
+                )
+
+                DisplayModePicker(
+                    title: "Storage",
+                    icon: "internaldrive",
+                    selection: $storageDisplayMode
+                )
+
+                DisplayModePicker(
+                    title: "Weather",
+                    icon: "cloud.sun",
+                    selection: $weatherDisplayMode
+                )
+
+                DisplayModePicker(
+                    title: "Network",
+                    icon: "network",
+                    selection: $networkDisplayMode
                 )
                 .padding(.bottom, 6)
             }
@@ -172,6 +221,33 @@ struct SettingToggle: View {
             Toggle("", isOn: $isOn)
                 .toggleStyle(.switch)
                 .controlSize(.small)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 5)
+    }
+}
+
+struct DisplayModePicker: View {
+    let title: String
+    let icon: String
+    @Binding var selection: String
+
+    var body: some View {
+        HStack {
+            Image(systemName: icon)
+                .font(.system(size: 11))
+                .foregroundStyle(.secondary)
+                .frame(width: 16)
+            Text(title)
+                .font(.system(size: 12))
+            Spacer()
+            Picker("", selection: $selection) {
+                Text("Icon").tag(MenuBarDisplayMode.icon.rawValue)
+                Text("Value").tag(MenuBarDisplayMode.value.rawValue)
+                Text("Both").tag(MenuBarDisplayMode.both.rawValue)
+            }
+            .pickerStyle(.segmented)
+            .frame(width: 110)
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 5)

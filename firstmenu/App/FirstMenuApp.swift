@@ -42,50 +42,40 @@ struct FirstMenuApp: App {
 /// CPU menu bar extra showing current CPU usage.
 struct CPUMenuBarExtra: Scene {
     var body: some Scene {
-        MenuBarExtra("CPU", systemImage: "cpu") {
-            CPUPopoverView()
-        }
-        .menuBarExtraStyle(.window)
+        MenuBarExtra(content: { CPUPopoverView() }, label: { CPUMenuBarLabel() })
+            .menuBarExtraStyle(.window)
     }
 }
 
 /// RAM menu bar extra showing memory usage.
 struct RAMMenuBarExtra: Scene {
     var body: some Scene {
-        MenuBarExtra("RAM", systemImage: "memorychip") {
-            RAMPopoverView()
-        }
-        .menuBarExtraStyle(.window)
+        MenuBarExtra(content: { RAMPopoverView() }, label: { RAMMenuBarLabel() })
+            .menuBarExtraStyle(.window)
     }
 }
 
 /// Storage menu bar extra showing disk usage.
 struct StorageMenuBarExtra: Scene {
     var body: some Scene {
-        MenuBarExtra("Storage", systemImage: "internaldrive") {
-            StoragePopoverView()
-        }
-        .menuBarExtraStyle(.window)
+        MenuBarExtra(content: { StoragePopoverView() }, label: { StorageMenuBarLabel() })
+            .menuBarExtraStyle(.window)
     }
 }
 
 /// Weather menu bar extra showing current temperature.
 struct WeatherMenuBarExtra: Scene {
     var body: some Scene {
-        MenuBarExtra("Weather", systemImage: "cloud.sun") {
-            WeatherPopoverView()
-        }
-        .menuBarExtraStyle(.window)
+        MenuBarExtra(content: { WeatherPopoverView() }, label: { WeatherMenuBarLabel() })
+            .menuBarExtraStyle(.window)
     }
 }
 
 /// Network menu bar extra showing current network speeds.
 struct NetworkMenuBarExtra: Scene {
     var body: some Scene {
-        MenuBarExtra("Network", systemImage: "network") {
-            NetworkPopoverView()
-        }
-        .menuBarExtraStyle(.window)
+        MenuBarExtra(content: { NetworkPopoverView() }, label: { NetworkMenuBarLabel() })
+            .menuBarExtraStyle(.window)
     }
 }
 
@@ -111,6 +101,58 @@ struct CaffeinateMenuBarExtra: Scene {
             CaffeinatePopoverView()
         }
         .menuBarExtraStyle(.window)
+    }
+}
+
+// MARK: - Menu Bar Labels
+
+/// Custom menu bar label for CPU that respects display mode settings.
+struct CPUMenuBarLabel: View {
+    @AppStorage("cpuDisplayMode") private var displayMode: String = MenuBarDisplayMode.value.rawValue
+    @State private var state = MenuBarState.shared
+
+    var body: some View {
+        CPUStatLabelView(percentage: state.cpuPercentage, displayMode: MenuBarDisplayMode(rawValue: displayMode) ?? .value)
+    }
+}
+
+/// Custom menu bar label for RAM that respects display mode settings.
+struct RAMMenuBarLabel: View {
+    @AppStorage("ramDisplayMode") private var displayMode: String = MenuBarDisplayMode.value.rawValue
+    @State private var state = MenuBarState.shared
+
+    var body: some View {
+        RAMStatLabelView(used: state.ramUsed, total: state.ramTotal, displayMode: MenuBarDisplayMode(rawValue: displayMode) ?? .value)
+    }
+}
+
+/// Custom menu bar label for Storage that respects display mode settings.
+struct StorageMenuBarLabel: View {
+    @AppStorage("storageDisplayMode") private var displayMode: String = MenuBarDisplayMode.value.rawValue
+    @State private var state = MenuBarState.shared
+
+    var body: some View {
+        SSDStatLabelView(used: state.storageUsed, total: state.storageTotal, displayMode: MenuBarDisplayMode(rawValue: displayMode) ?? .value)
+    }
+}
+
+/// Custom menu bar label for Weather that respects display mode settings.
+struct WeatherMenuBarLabel: View {
+    @AppStorage("weatherDisplayMode") private var displayMode: String = MenuBarDisplayMode.both.rawValue
+    @State private var state = MenuBarState.shared
+
+    var body: some View {
+        WeatherStatLabelView(temperature: state.temperature, sfSymbolName: state.sfSymbolName, displayMode: MenuBarDisplayMode(rawValue: displayMode) ?? .both)
+    }
+}
+
+/// Custom menu bar label for Network that respects display mode settings.
+struct NetworkMenuBarLabel: View {
+    @AppStorage("networkDisplayMode") private var displayMode: String = MenuBarDisplayMode.value.rawValue
+    @State private var state = MenuBarState.shared
+
+    var body: some View {
+        NetworkStatLabelView(downloadBPS: state.downloadBPS, uploadBPS: state.uploadBPS, displayMode: MenuBarDisplayMode(rawValue: displayMode) ?? .value)
     }
 }
 
