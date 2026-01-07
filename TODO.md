@@ -144,7 +144,10 @@ This file tracks pending work based on [MASTER_PLAN.md](MASTER_PLAN.md).
 - [x] Homebrew formula guide (docs/release/homebrew-formula.md)
 - [x] GitHub CI/CD workflow (.github/workflows/ci.yml)
 - [x] GitHub Releases automation (.github/workflows/release.yml)
-- [ ] Menu bar icon design (needs actual icon files — asset catalog is ready)
+- [x] Menu bar icon design ✅ COMPLETED
+  - Created programmatic icon using Swift with blue gradient background
+  - Features mini chart bars representing stats and "M" for Menu
+  - All required sizes: 16x16 through 512x512 (including 2x retina versions)
 
 ---
 
