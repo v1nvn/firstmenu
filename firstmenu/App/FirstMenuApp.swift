@@ -34,10 +34,6 @@ struct FirstMenuApp: App {
         NetworkMenuBarExtra()
         AppsMenuBarExtra()
         CaffeinateMenuBarExtra()
-
-        Settings {
-            SettingsMenuView()
-        }
     }
 }
 

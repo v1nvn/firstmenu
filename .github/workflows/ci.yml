@@ -41,6 +41,9 @@ jobs:
       - name: Resolve dependencies
         run: swift package resolve
 
+      - name: Setup SwiftLint
+        run: make setup-lint
+
       - name: Run SwiftLint
         run: make lint
 

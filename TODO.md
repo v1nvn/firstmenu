@@ -74,6 +74,56 @@ This file tracks pending work based on [MASTER_PLAN.md](MASTER_PLAN.md).
 
 ## Pending TODO
 
+### High Priority — UI/UX Issues
+
+#### ~~1. Remove "Hello World" Window on App Launch~~ ✅ COMPLETED
+**Issue:** Running `make run` opens a default SwiftUI window (shows "firstmenu" or "Hello World" content)
+**Root Cause:** The `Settings` scene in `FirstMenuApp.swift:38-40` creates a default window that opens on launch
+**File:** `firstmenu/App/FirstMenuApp.swift`
+**Fix:** Removed the `Settings` scene from FirstMenuApp.swift. Settings now only accessible from menu item popovers.
+
+#### ~~2. Add Quit and Settings Buttons to All Menu Popovers~~ ✅ COMPLETED
+**Issue:** Every menu dropdown/popover should have a quit and settings button
+**Current State:** Only the SettingsMenuView has a quit button; individual popovers (CPU, RAM, Storage, Weather, Network, Apps, Caffeinate) lack these actions
+**Files:**
+- `firstmenu/UI/StatViews/StatPopoverViews.swift` (CPU, RAM, Storage, Weather, Network, Caffeinate, Apps)
+**Fix:** Added consistent `PopoverFooter` component with "Settings..." and "Quit" buttons to all popover views.
+
+#### ~~3. Create Native Settings Panel for All Menu Items~~ ✅ COMPLETED
+**Issue:** Need a unified, native settings experience accessible from each menu
+**Current State:** Settings are only accessible through the separate Settings scene (which has the hello world window issue)
+**File:** `firstmenu/UI/Components/PopoverFooter.swift`
+**Fix:** Created `SettingsWindowManager` that opens a native NSWindow with the SettingsMenuView content, accessible from any popover's "Settings..." button.
+
+#### 4. Add Icon/Value Display Toggle for Each Menu Item
+**Issue:** Users should be able to choose whether to show the icon or the value (e.g., CPU: show "cpu" icon or "45%" usage)
+**Files:**
+- `firstmenu/UI/StatViews/StatLabelViews.swift` (menu bar labels)
+- `firstmenu/UI/Menus/SettingsMenu.swift` (settings UI)
+**Fix Needed:**
+- Add `@AppStorage` properties for each menu item's display mode (icon vs value)
+- Update `MenuBarLabelView` variants to conditionally show icon or value
+- Add toggles in SettingsMenuView for each menu item
+
+#### 5. Improve Native Feel Throughout the App
+**Issue:** The UI doesn't fully feel native to macOS
+**Areas to Address:**
+- ~~Button hover states~~ ✅ COMPLETED - Added `CompactMenuButtonStyle` with hover effects
+- Native menu behaviors (right-click handling, keyboard navigation)
+- Proper use of NSPanel for popovers vs window style
+- Native animations and transitions
+- Native color schemes and materials
+- Proper accessibility labels and VoiceOver support
+**Files:** All UI files in `firstmenu/UI/`
+
+#### ~~6. Fix Hover Highlighting on Dropdown Selectors~~ ✅ COMPLETED
+**Issue:** In dropdowns with selectors (like Keep Awake), items don't get highlighted on hover
+**Root Cause:** Buttons using `.buttonStyle(.borderless)` don't provide visual hover feedback
+**Files:**
+- `firstmenu/UI/Design/ButtonStyles.swift` (new `CompactMenuButtonStyle`)
+- `firstmenu/UI/StatViews/StatPopoverViews.swift` (updated `CaffeinatePresetButton`)
+**Fix:** Created custom `CompactMenuButtonStyle` with proper hover states using `@State` tracking and `.controlAccentColor` opacity changes.
+
 ### Low Priority
 
 #### Release Preparation

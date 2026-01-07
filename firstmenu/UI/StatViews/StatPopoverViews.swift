@@ -13,31 +13,37 @@ struct CPUPopoverView: View {
     @State private var state = MenuBarState.shared
 
     var body: some View {
-        VStack(alignment: .leading, spacing: DesignSystem.Spacing.standard) {
-            HStack {
-                Text("CPU")
-                    .font(.system(size: 13, weight: .semibold))
-                Spacer()
-                Text("\(Int(state.cpuPercentage))%")
-                    .font(.system(size: 13, weight: .medium).monospacedDigit())
-                    .foregroundStyle(DesignSystem.Colors.progressColor(for: state.cpuPercentage))
-            }
+        VStack(alignment: .leading, spacing: 0) {
+            VStack(alignment: .leading, spacing: DesignSystem.Spacing.standard) {
+                HStack {
+                    Text("CPU")
+                        .font(.system(size: 13, weight: .semibold))
+                    Spacer()
+                    Text("\(Int(state.cpuPercentage))%")
+                        .font(.system(size: 13, weight: .medium).monospacedDigit())
+                        .foregroundStyle(DesignSystem.Colors.progressColor(for: state.cpuPercentage))
+                }
 
-            ProgressView(value: state.cpuPercentage / 100)
-                .progressViewStyle(.linear)
-                .tint(DesignSystem.Colors.progressColor(for: state.cpuPercentage))
+                ProgressView(value: state.cpuPercentage / 100)
+                    .progressViewStyle(.linear)
+                    .tint(DesignSystem.Colors.progressColor(for: state.cpuPercentage))
 
-            HStack {
-                Text("Cores")
-                    .font(.system(size: 11))
-                    .foregroundStyle(.secondary)
-                Spacer()
-                Text("\(state.coreCount)")
-                    .font(.system(size: 11).monospacedDigit())
-                    .foregroundStyle(.secondary)
+                HStack {
+                    Text("Cores")
+                        .font(.system(size: 11))
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    Text("\(state.coreCount)")
+                        .font(.system(size: 11).monospacedDigit())
+                        .foregroundStyle(.secondary)
+                }
             }
+            .padding()
+
+            Divider()
+
+            PopoverFooter()
         }
-        .padding()
         .frame(width: DesignSystem.Popover.Width.standard)
         .background(.ultraThinMaterial)
     }
@@ -61,28 +67,34 @@ struct RAMPopoverView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: DesignSystem.Spacing.standard) {
-            HStack {
-                Text("Memory")
-                    .font(.system(size: 13, weight: .semibold))
-                Spacer()
-                Text("\(Int(percentage))%")
-                    .font(.system(size: 13, weight: .medium).monospacedDigit())
-                    .foregroundStyle(DesignSystem.Colors.progressColor(for: percentage))
-            }
+        VStack(alignment: .leading, spacing: 0) {
+            VStack(alignment: .leading, spacing: DesignSystem.Spacing.standard) {
+                HStack {
+                    Text("Memory")
+                        .font(.system(size: 13, weight: .semibold))
+                    Spacer()
+                    Text("\(Int(percentage))%")
+                        .font(.system(size: 13, weight: .medium).monospacedDigit())
+                        .foregroundStyle(DesignSystem.Colors.progressColor(for: percentage))
+                }
 
-            ProgressView(value: percentage / 100)
-                .progressViewStyle(.linear)
-                .tint(DesignSystem.Colors.progressColor(for: percentage))
+                ProgressView(value: percentage / 100)
+                    .progressViewStyle(.linear)
+                    .tint(DesignSystem.Colors.progressColor(for: percentage))
 
-            HStack {
-                Text(String(format: "%.1f of %.1f GB", usedGB, totalGB))
-                    .font(.system(size: 11))
-                    .foregroundStyle(.secondary)
-                Spacer()
+                HStack {
+                    Text(String(format: "%.1f of %.1f GB", usedGB, totalGB))
+                        .font(.system(size: 11))
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                }
             }
+            .padding()
+
+            Divider()
+
+            PopoverFooter()
         }
-        .padding()
         .frame(width: DesignSystem.Popover.Width.wide)
         .background(.ultraThinMaterial)
     }
@@ -106,28 +118,34 @@ struct StoragePopoverView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: DesignSystem.Spacing.standard) {
-            HStack {
-                Text("Storage")
-                    .font(.system(size: 13, weight: .semibold))
-                Spacer()
-                Text("\(Int(percentage))%")
-                    .font(.system(size: 13, weight: .medium).monospacedDigit())
-                    .foregroundStyle(DesignSystem.Colors.progressColor(for: percentage, thresholds: (80, 95)))
-            }
+        VStack(alignment: .leading, spacing: 0) {
+            VStack(alignment: .leading, spacing: DesignSystem.Spacing.standard) {
+                HStack {
+                    Text("Storage")
+                        .font(.system(size: 13, weight: .semibold))
+                    Spacer()
+                    Text("\(Int(percentage))%")
+                        .font(.system(size: 13, weight: .medium).monospacedDigit())
+                        .foregroundStyle(DesignSystem.Colors.progressColor(for: percentage, thresholds: (80, 95)))
+                }
 
-            ProgressView(value: percentage / 100)
-                .progressViewStyle(.linear)
-                .tint(DesignSystem.Colors.progressColor(for: percentage, thresholds: (80, 95)))
+                ProgressView(value: percentage / 100)
+                    .progressViewStyle(.linear)
+                    .tint(DesignSystem.Colors.progressColor(for: percentage, thresholds: (80, 95)))
 
-            HStack {
-                Text(String(format: "%.0f of %.0f GB free", totalGB - usedGB, totalGB))
-                    .font(.system(size: 11))
-                    .foregroundStyle(.secondary)
-                Spacer()
+                HStack {
+                    Text(String(format: "%.0f of %.0f GB free", totalGB - usedGB, totalGB))
+                        .font(.system(size: 11))
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                }
             }
+            .padding()
+
+            Divider()
+
+            PopoverFooter()
         }
-        .padding()
         .frame(width: DesignSystem.Popover.Width.wide)
         .background(.ultraThinMaterial)
     }
@@ -157,29 +175,35 @@ struct WeatherPopoverView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: DesignSystem.Spacing.standard) {
-            HStack {
-                Text("Weather")
-                    .font(.system(size: 13, weight: .semibold))
-                Spacer()
-                HStack(spacing: DesignSystem.Spacing.tight) {
-                    Image(systemName: state.sfSymbolName)
-                    Text("\(Int(state.temperature))°")
-                        .font(.system(size: 13, weight: .medium).monospacedDigit())
+        VStack(alignment: .leading, spacing: 0) {
+            VStack(alignment: .leading, spacing: DesignSystem.Spacing.standard) {
+                HStack {
+                    Text("Weather")
+                        .font(.system(size: 13, weight: .semibold))
+                    Spacer()
+                    HStack(spacing: DesignSystem.Spacing.tight) {
+                        Image(systemName: state.sfSymbolName)
+                        Text("\(Int(state.temperature))°")
+                            .font(.system(size: 13, weight: .medium).monospacedDigit())
+                    }
+                }
+
+                HStack {
+                    Text(conditionText)
+                        .font(.system(size: 11))
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    Text("IP-based")
+                        .font(.system(size: 10))
+                        .foregroundStyle(.tertiary)
                 }
             }
+            .padding()
 
-            HStack {
-                Text(conditionText)
-                    .font(.system(size: 11))
-                    .foregroundStyle(.secondary)
-                Spacer()
-                Text("IP-based")
-                    .font(.system(size: 10))
-                    .foregroundStyle(.tertiary)
-            }
+            Divider()
+
+            PopoverFooter()
         }
-        .padding()
         .frame(width: DesignSystem.Popover.Width.wide)
         .background(.ultraThinMaterial)
     }
@@ -202,38 +226,44 @@ struct NetworkPopoverView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: DesignSystem.Spacing.standard) {
-            HStack {
-                Text("Network")
-                    .font(.system(size: 13, weight: .semibold))
-                Spacer()
-            }
+        VStack(alignment: .leading, spacing: 0) {
+            VStack(alignment: .leading, spacing: DesignSystem.Spacing.standard) {
+                HStack {
+                    Text("Network")
+                        .font(.system(size: 13, weight: .semibold))
+                    Spacer()
+                }
 
-            HStack {
-                Image(systemName: "arrow.down")
-                    .font(.system(size: 10))
-                    .foregroundStyle(.secondary)
-                Text(formatSpeed(state.downloadBPS))
-                    .font(.system(size: 12, weight: .medium).monospacedDigit())
-                Spacer()
-            }
+                HStack {
+                    Image(systemName: "arrow.down")
+                        .font(.system(size: 10))
+                        .foregroundStyle(.secondary)
+                    Text(formatSpeed(state.downloadBPS))
+                        .font(.system(size: 12, weight: .medium).monospacedDigit())
+                    Spacer()
+                }
 
-            HStack {
-                Image(systemName: "arrow.up")
-                    .font(.system(size: 10))
-                    .foregroundStyle(.secondary)
-                Text(formatSpeed(state.uploadBPS))
-                    .font(.system(size: 12, weight: .medium).monospacedDigit())
-                Spacer()
-            }
+                HStack {
+                    Image(systemName: "arrow.up")
+                        .font(.system(size: 10))
+                        .foregroundStyle(.secondary)
+                    Text(formatSpeed(state.uploadBPS))
+                        .font(.system(size: 12, weight: .medium).monospacedDigit())
+                    Spacer()
+                }
 
-            if state.downloadBPS == 0 && state.uploadBPS == 0 {
-                Text("No activity")
-                    .font(.system(size: 11))
-                    .foregroundStyle(.tertiary)
+                if state.downloadBPS == 0 && state.uploadBPS == 0 {
+                    Text("No activity")
+                        .font(.system(size: 11))
+                        .foregroundStyle(.tertiary)
+                }
             }
+            .padding()
+
+            Divider()
+
+            PopoverFooter()
         }
-        .padding()
         .frame(width: DesignSystem.Popover.Width.standard)
         .background(.ultraThinMaterial)
     }
@@ -360,6 +390,10 @@ struct AppsPopoverView: View {
                 }
             }
             .background(Color.black.opacity(0.03))
+
+            Divider()
+
+            PopoverFooter()
         }
         .frame(width: 240)
         .background(.ultraThinMaterial)
@@ -387,10 +421,7 @@ struct CaffeinatePresetButton: View {
                 }
             }
         }
-        .buttonStyle(.borderless)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, 12)
-        .padding(.vertical, 5)
+        .compactMenuButtonStyle()
     }
 }
 
@@ -474,78 +505,84 @@ struct CaffeinatePopoverView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: DesignSystem.Spacing.standard) {
-            // Header with status
-            HStack {
-                HStack(spacing: 6) {
-                    Image(systemName: systemImageName)
-                        .font(.system(size: 12))
-                        .foregroundStyle(isActive ? .green : .secondary)
-                    Text("Keep Awake")
-                        .font(.system(size: 13, weight: .semibold))
+        VStack(alignment: .leading, spacing: 0) {
+            VStack(alignment: .leading, spacing: DesignSystem.Spacing.standard) {
+                // Header with status
+                HStack {
+                    HStack(spacing: 6) {
+                        Image(systemName: systemImageName)
+                            .font(.system(size: 12))
+                            .foregroundStyle(isActive ? .green : .secondary)
+                        Text("Keep Awake")
+                            .font(.system(size: 13, weight: .semibold))
+                    }
+                    Spacer()
+                    Circle()
+                        .fill(isActive ? .green : Color.secondary.opacity(0.4))
+                        .frame(width: 8, height: 8)
                 }
-                Spacer()
-                Circle()
-                    .fill(isActive ? .green : Color.secondary.opacity(0.4))
-                    .frame(width: 8, height: 8)
-            }
 
-            // Status text
-            Text(statusText)
-                .font(.system(size: 11))
-                .foregroundStyle(.secondary)
+                // Status text
+                Text(statusText)
+                    .font(.system(size: 11))
+                    .foregroundStyle(.secondary)
+
+                Divider()
+
+                // Presets
+                VStack(spacing: 0) {
+                    CaffeinatePresetButton(
+                        title: "15 Minutes",
+                        isActive: false,
+                        action: {
+                            Task { try? await MenuBarState.shared.powerController?.keepAwake(for: 15 * 60) }
+                        }
+                    )
+
+                    CaffeinatePresetButton(
+                        title: "1 Hour",
+                        isActive: false,
+                        action: {
+                            Task { try? await MenuBarState.shared.powerController?.keepAwake(for: 60 * 60) }
+                        }
+                    )
+
+                    CaffeinatePresetButton(
+                        title: "Indefinitely",
+                        isActive: isIndefinite,
+                        action: {
+                            Task {
+                                if isIndefinite {
+                                    try? await MenuBarState.shared.powerController?.allowSleep()
+                                } else {
+                                    try? await MenuBarState.shared.powerController?.keepAwakeIndefinitely()
+                                }
+                            }
+                        }
+                    )
+
+                    if isActive {
+                        Divider()
+                            .padding(.vertical, 4)
+
+                        Button("Disable Keep Awake") {
+                            Task { try? await MenuBarState.shared.powerController?.allowSleep() }
+                        }
+                        .buttonStyle(.borderless)
+                        .foregroundStyle(.red)
+                        .font(.caption)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                    }
+                }
+            }
+            .padding()
 
             Divider()
 
-            // Presets
-            VStack(spacing: 0) {
-                CaffeinatePresetButton(
-                    title: "15 Minutes",
-                    isActive: false,
-                    action: {
-                        Task { try? await MenuBarState.shared.powerController?.keepAwake(for: 15 * 60) }
-                    }
-                )
-
-                CaffeinatePresetButton(
-                    title: "1 Hour",
-                    isActive: false,
-                    action: {
-                        Task { try? await MenuBarState.shared.powerController?.keepAwake(for: 60 * 60) }
-                    }
-                )
-
-                CaffeinatePresetButton(
-                    title: "Indefinitely",
-                    isActive: isIndefinite,
-                    action: {
-                        Task {
-                            if isIndefinite {
-                                try? await MenuBarState.shared.powerController?.allowSleep()
-                            } else {
-                                try? await MenuBarState.shared.powerController?.keepAwakeIndefinitely()
-                            }
-                        }
-                    }
-                )
-
-                if isActive {
-                    Divider()
-                        .padding(.vertical, 4)
-
-                    Button("Disable Keep Awake") {
-                        Task { try? await MenuBarState.shared.powerController?.allowSleep() }
-                    }
-                    .buttonStyle(.borderless)
-                    .foregroundStyle(.red)
-                    .font(.caption)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                }
-            }
+            PopoverFooter()
         }
-        .padding()
         .frame(width: DesignSystem.Popover.Width.wide)
         .background(.ultraThinMaterial)
     }
