@@ -40,13 +40,14 @@ This file tracks pending work based on [MASTER_PLAN.md](MASTER_PLAN.md).
 - [x] Settings scene wired to SettingsMenuView
 
 ### Testing
-- [x] **357 tests** across 28 test files
-- [x] Domain tests: 25 tests (100% coverage)
-- [x] Infrastructure tests: 100 tests (~95% coverage)
-- [x] UI tests: 225 tests
+- [x] **478 tests** across 29 test files (357 original + 121 new edge case tests)
+- [x] Domain tests: 56 tests (100% coverage, added 31 edge case tests)
+- [x] Infrastructure tests: 220 tests (~95% coverage, added 120 edge case tests)
+- [x] UI tests: 195 tests
 - [x] Integration tests: 7 tests
 - [x] Mock providers for all infrastructure
 - [x] Graceful error handling tests
+- [x] **Comprehensive edge case coverage** - Zero values, maximum values, concurrent operations, error states
 
 ### Error Handling
 - [x] Graceful degradation when providers fail
@@ -119,12 +120,12 @@ make run          # Build and launch the app
 ```
 
 ### Test Stats
-- **Total Tests:** 357
-- **Domain:** 25 tests (100% coverage)
-- **Infrastructure:** 100 tests (~95% coverage)
-- **UI:** 225 tests
+- **Total Tests:** 478 (357 original + 121 new edge case tests)
+- **Domain:** 56 tests (100% coverage)
+- **Infrastructure:** 220 tests (~95% coverage)
+- **UI:** 195 tests
 - **Integration:** 7 tests
-- **Test Files:** 28
+- **Test Files:** 29
 
 ### File Count
 - **Source files:** 33
