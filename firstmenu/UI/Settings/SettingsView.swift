@@ -2,55 +2,34 @@
 //  SettingsView.swift
 //  firstmenu
 //
-//  Native macOS-style settings window with sidebar
+//  Native macOS settings view using TabView
 //
 
 import SwiftUI
 
-// MARK: - Settings Navigation Item
-
-enum SettingsNavigationItem: String, CaseIterable {
-    case general = "General"
-    case display = "Display"
-    case about = "About"
-
-    var icon: String {
-        switch self {
-        case .general: return "gearshape"
-        case .display: return "rectangle.on.rectangle"
-        case .about: return "info.circle"
-        }
-    }
-}
-
 // MARK: - Main Settings View
 
-/// Native macOS-style settings window with sidebar navigation.
+/// Native macOS settings view using TabView for categories.
+/// This follows Apple's recommended pattern for app settings on macOS.
 struct SettingsView: View {
-    @State private var selectedSidebar: SettingsNavigationItem = .general
-
     var body: some View {
-        NavigationSplitView {
-            List(SettingsNavigationItem.allCases, id: \.self, selection: $selectedSidebar) { item in
-                Label(item.rawValue, systemImage: item.icon)
-                    .tag(item)
-            }
-            .navigationSplitViewColumnWidth(min: 150, ideal: 180)
-            .listStyle(.sidebar)
-        } detail: {
-            switch selectedSidebar {
-            case .general:
-                GeneralSettingsView()
-                    .navigationTitle(SettingsNavigationItem.general.rawValue)
-            case .display:
-                DisplaySettingsView()
-                    .navigationTitle(SettingsNavigationItem.display.rawValue)
-            case .about:
-                AboutSettingsView()
-                    .navigationTitle(SettingsNavigationItem.about.rawValue)
-            }
+        TabView {
+            GeneralSettingsView()
+                .tabItem {
+                    Label("General", systemImage: "gearshape")
+                }
+
+            DisplaySettingsView()
+                .tabItem {
+                    Label("Display", systemImage: "rectangle.on.rectangle")
+                }
+
+            AboutSettingsView()
+                .tabItem {
+                    Label("About", systemImage: "info.circle")
+                }
         }
-        .frame(minWidth: 600, minHeight: 400)
+        .frame(minWidth: 500, minHeight: 350)
     }
 }
 
@@ -61,7 +40,7 @@ struct GeneralSettingsView: View {
 
     var body: some View {
         Form {
-            Section("Weather") {
+            Section {
                 Picker("Refresh Interval", selection: $weatherRefreshInterval) {
                     Text("5 minutes").tag(5.0)
                     Text("15 minutes").tag(15.0)
@@ -69,14 +48,14 @@ struct GeneralSettingsView: View {
                     Text("1 hour").tag(60.0)
                 }
                 .pickerStyle(.radioGroup)
-
+            } header: {
+                Text("Weather")
+            } footer: {
                 Text("Location is detected automatically from your IP address.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
             }
         }
         .formStyle(.grouped)
-        .scrollContentBackground(.hidden)
+        .navigationSplitViewColumnWidth(min: 350, ideal: 400)
     }
 }
 
@@ -97,38 +76,37 @@ struct DisplaySettingsView: View {
 
     var body: some View {
         Form {
-            Section("Menu Bar Items") {
+            Section {
                 Toggle("CPU Usage", isOn: $showCPUInMenuBar)
                 Toggle("Memory", isOn: $showRAMInMenuBar)
                 Toggle("Storage", isOn: $showStorageInMenuBar)
                 Toggle("Weather", isOn: $showWeatherInMenuBar)
                 Toggle("Network", isOn: $showNetworkInMenuBar)
+            } header: {
+                Text("Menu Bar Items")
             }
 
-            Section("Display Mode") {
+            Section {
                 displayModePicker(title: "CPU", icon: "cpu", selection: $cpuDisplayMode)
                 displayModePicker(title: "Memory", icon: "memorychip", selection: $ramDisplayMode)
                 displayModePicker(title: "Storage", icon: "internaldrive", selection: $storageDisplayMode)
                 displayModePicker(title: "Weather", icon: "cloud.sun", selection: $weatherDisplayMode)
                 displayModePicker(title: "Network", icon: "network", selection: $networkDisplayMode)
+            } header: {
+                Text("Display Mode")
             }
         }
         .formStyle(.grouped)
-        .scrollContentBackground(.hidden)
     }
 
     @ViewBuilder
     private func displayModePicker(title: String, icon: String, selection: Binding<String>) -> some View {
-        HStack {
-            Label(title, systemImage: icon)
-                .frame(width: 120, alignment: .leading)
-            Picker("", selection: selection) {
-                Text("Icon").tag(MenuBarDisplayMode.icon.rawValue)
-                Text("Value").tag(MenuBarDisplayMode.value.rawValue)
-                Text("Both").tag(MenuBarDisplayMode.both.rawValue)
-            }
-            .pickerStyle(.radioGroup)
+        Picker(title, selection: selection) {
+            Text("Icon").tag(MenuBarDisplayMode.icon.rawValue)
+            Text("Value").tag(MenuBarDisplayMode.value.rawValue)
+            Text("Both").tag(MenuBarDisplayMode.both.rawValue)
         }
+        .pickerStyle(.radioGroup)
     }
 }
 
@@ -146,31 +124,28 @@ struct AboutSettingsView: View {
     var body: some View {
         Form {
             Section {
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("firstmenu")
-                            .font(.title2)
-                            .fontWeight(.semibold)
-                        Text("Version \(version) (\(build))")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        Text("A minimal macOS menu bar system companion")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    Image(systemName: "menubar.rectangle")
-                        .font(.system(size: 48))
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("firstmenu")
+                        .font(.title)
+                        .fontWeight(.semibold)
+
+                    Text("Version \(version) (\(build))")
+                        .font(.body)
                         .foregroundStyle(.secondary)
-                        .symbolRenderingMode(.hierarchical)
+
+                    Text("A minimal macOS menu bar system companion")
+                        .font(.body)
+                        .foregroundStyle(.secondary)
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.vertical, 8)
             }
 
-            Section("Information") {
+            Section {
                 LabeledContent("Version", value: version)
                 LabeledContent("Build", value: build)
-                LabeledContent("Author", value: "Vineet Kumar")
+            } header: {
+                Text("Information")
             }
 
             Section {
@@ -181,7 +156,6 @@ struct AboutSettingsView: View {
             }
         }
         .formStyle(.grouped)
-        .scrollContentBackground(.hidden)
     }
 }
 
@@ -189,5 +163,5 @@ struct AboutSettingsView: View {
 
 #Preview {
     SettingsView()
-        .frame(width: 700, height: 500)
+        .frame(width: 600, height: 450)
 }

@@ -27,6 +27,7 @@ struct FirstMenuApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     var body: some Scene {
+        // Menu bar extras
         CPUMenuBarExtra()
         RAMMenuBarExtra()
         StorageMenuBarExtra()
@@ -34,6 +35,11 @@ struct FirstMenuApp: App {
         NetworkMenuBarExtra()
         AppsMenuBarExtra()
         CaffeinateMenuBarExtra()
+
+        // Native settings scene - Apple's recommended way
+        Settings {
+            SettingsView()
+        }
     }
 }
 
