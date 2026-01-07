@@ -81,6 +81,8 @@ struct PopoverFooter: View {
                 SettingsWindowManager.shared.showSettings()
             }
             .footerButtonStyle()
+            .accessibilityLabel("Open Settings")
+            .accessibilityHint("Opens the settings panel")
 
             Spacer()
 
@@ -88,10 +90,14 @@ struct PopoverFooter: View {
                 NSApplication.shared.terminate(nil)
             }
             .footerButtonStyle()
+            .accessibilityLabel("Quit firstmenu")
+            .accessibilityHint("Quits the application")
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
         .background(Color.black.opacity(0.05))
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("Menu options")
     }
 }
 
@@ -105,14 +111,18 @@ struct CompactPopoverFooter: View {
                 SettingsWindowManager.shared.showSettings()
             }
             .footerButtonStyle()
+            .accessibilityLabel("Open Settings")
 
             Button("Quit") {
                 NSApplication.shared.terminate(nil)
             }
             .footerButtonStyle()
+            .accessibilityLabel("Quit firstmenu")
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 6)
         .background(Color.black.opacity(0.05))
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("Menu options")
     }
 }

@@ -95,15 +95,18 @@ This file tracks pending work based on [MASTER_PLAN.md](MASTER_PLAN.md).
 **File:** `firstmenu/UI/Components/PopoverFooter.swift`
 **Fix:** Created `SettingsWindowManager` that opens a native NSWindow with the SettingsMenuView content, accessible from any popover's "Settings..." button.
 
-#### 4. Add Icon/Value Display Toggle for Each Menu Item
+#### ~~4. Add Icon/Value Display Toggle for Each Menu Item~~ ✅ COMPLETED
 **Issue:** Users should be able to choose whether to show the icon or the value (e.g., CPU: show "cpu" icon or "45%" usage)
 **Files:**
 - `firstmenu/UI/StatViews/StatLabelViews.swift` (menu bar labels)
 - `firstmenu/UI/Menus/SettingsMenu.swift` (settings UI)
-**Fix Needed:**
-- Add `@AppStorage` properties for each menu item's display mode (icon vs value)
-- Update `MenuBarLabelView` variants to conditionally show icon or value
-- Add toggles in SettingsMenuView for each menu item
+- `firstmenu/App/FirstMenuApp.swift` (menu bar extras)
+**Fix:**
+- Added `MenuBarDisplayMode` enum with icon/value/both options
+- Updated all StatLabelViews (CPU, RAM, Storage, Weather, Network) to support display mode switching
+- Added `@AppStorage` properties for each menu item's display mode
+- Created `DisplayModePicker` component for settings UI
+- Created custom menu bar labels that respect @AppStorage settings
 
 #### 5. Improve Native Feel Throughout the App
 **Issue:** The UI doesn't fully feel native to macOS

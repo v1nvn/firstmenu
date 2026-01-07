@@ -23,10 +23,14 @@ struct CPUPopoverView: View {
                         .font(.system(size: 13, weight: .medium).monospacedDigit())
                         .foregroundStyle(DesignSystem.Colors.progressColor(for: state.cpuPercentage))
                 }
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel("CPU usage: \(Int(state.cpuPercentage)) percent")
 
                 ProgressView(value: state.cpuPercentage / 100)
                     .progressViewStyle(.linear)
                     .tint(DesignSystem.Colors.progressColor(for: state.cpuPercentage))
+                    .accessibilityLabel("CPU usage progress")
+                    .accessibilityValue("\(Int(state.cpuPercentage)) percent")
 
                 HStack {
                     Text("Cores")
@@ -37,6 +41,8 @@ struct CPUPopoverView: View {
                         .font(.system(size: 11).monospacedDigit())
                         .foregroundStyle(.secondary)
                 }
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel("\(state.coreCount) CPU cores")
             }
             .padding()
 
@@ -46,6 +52,8 @@ struct CPUPopoverView: View {
         }
         .frame(width: DesignSystem.Popover.Width.standard)
         .background(.ultraThinMaterial)
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("CPU usage panel")
     }
 }
 
@@ -77,10 +85,14 @@ struct RAMPopoverView: View {
                         .font(.system(size: 13, weight: .medium).monospacedDigit())
                         .foregroundStyle(DesignSystem.Colors.progressColor(for: percentage))
                 }
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel("Memory usage: \(Int(percentage)) percent")
 
                 ProgressView(value: percentage / 100)
                     .progressViewStyle(.linear)
                     .tint(DesignSystem.Colors.progressColor(for: percentage))
+                    .accessibilityLabel("Memory usage progress")
+                    .accessibilityValue("\(Int(percentage)) percent")
 
                 HStack {
                     Text(String(format: "%.1f of %.1f GB", usedGB, totalGB))
@@ -88,6 +100,7 @@ struct RAMPopoverView: View {
                         .foregroundStyle(.secondary)
                     Spacer()
                 }
+                .accessibilityLabel("\(String(format: "%.1f", usedGB)) gigabytes used of \(String(format: "%.1f", totalGB)) gigabytes total")
             }
             .padding()
 
@@ -97,6 +110,8 @@ struct RAMPopoverView: View {
         }
         .frame(width: DesignSystem.Popover.Width.wide)
         .background(.ultraThinMaterial)
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("Memory usage panel")
     }
 }
 
