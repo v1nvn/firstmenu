@@ -27,31 +27,33 @@ class SettingsWindowManager {
                 return
             }
 
-            // Create new settings window
-            let contentView = SettingsMenuView()
+            // Create new settings window with native macOS style
+            let contentView = SettingsView()
             let hostingController = NSHostingController(rootView: contentView)
 
             let window = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 300, height: 500),
-                styleMask: [.titled, .closable],
+                contentRect: NSRect(x: 0, y: 0, width: 700, height: 450),
+                styleMask: [.titled, .closable, .miniaturizable, .resizable],
                 backing: .buffered,
                 defer: false
             )
-            window.title = "firstmenu Settings"
+            window.title = "Settings"
             window.contentViewController = hostingController
             window.center()
             window.setFrameAutosaveName("SettingsWindow")
             window.isReleasedWhenClosed = false
 
-            // Make it behave like a proper settings window
-            window.titlebarAppearsTransparent = true
-            window.titleVisibility = .hidden
-            window.styleMask = [.fullSizeContentView, .borderless]
+            // Enable full-size content view with native titlebar
+            window.titlebarAppearsTransparent = false
+            window.titleVisibility = .visible
+            window.styleMask.remove(.fullSizeContentView)
 
-            // Apply native styling
-            window.backgroundColor = .clear
-            window.contentView?.wantsLayer = true
-            window.contentView?.layer?.backgroundColor = NSColor.clear.cgColor
+            // Set min size
+            window.minSize = NSSize(width: 550, height: 350)
+
+            // Make it a proper utility/settings window
+            window.level = .floating
+            window.collectionBehavior = [.moveToActiveSpace]
 
             self.settingsWindow = window
             window.makeKeyAndOrderFront(nil)
