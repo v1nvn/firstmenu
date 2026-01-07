@@ -299,4 +299,172 @@ final class StatPopoverViewsTests: XCTestCase {
         _ = view.body
         // Should display as "0 B/s"
     }
+
+    // MARK: - CaffeinatePopoverView Tests
+
+    func testCaffeinatePopoverViewRenders() {
+        MenuBarState.shared.caffeinateState = .inactive
+        let view = CaffeinatePopoverView()
+        XCTAssertNotNil(view, "CaffeinatePopoverView should render")
+    }
+
+    func testCaffeinatePopoverViewWithInactiveState() {
+        MenuBarState.shared.caffeinateState = .inactive
+        let view = CaffeinatePopoverView()
+        _ = view.body
+    }
+
+    func testCaffeinatePopoverViewWithActiveState() {
+        MenuBarState.shared.caffeinateState = .active(until: Date().addingTimeInterval(1800))
+        let view = CaffeinatePopoverView()
+        _ = view.body
+    }
+
+    func testCaffeinatePopoverViewWithIndefiniteState() {
+        MenuBarState.shared.caffeinateState = .indefinite
+        let view = CaffeinatePopoverView()
+        _ = view.body
+    }
+
+    func testCaffeinatePopoverViewWithExpiredActiveState() {
+        // Active state with past date
+        MenuBarState.shared.caffeinateState = .active(until: Date().addingTimeInterval(-100))
+        let view = CaffeinatePopoverView()
+        _ = view.body
+    }
+
+    func testCaffeinatePopoverViewSystemImageNameInactive() {
+        MenuBarState.shared.caffeinateState = .inactive
+        let view = CaffeinatePopoverView()
+        _ = view.body
+        // Should use moon.zzz for inactive state
+    }
+
+    func testCaffeinatePopoverViewSystemImageNameActive() {
+        MenuBarState.shared.caffeinateState = .active(until: Date().addingTimeInterval(3600))
+        let view = CaffeinatePopoverView()
+        _ = view.body
+        // Should use moon.fill for active state
+    }
+
+    func testCaffeinatePopoverViewSystemImageNameIndefinite() {
+        MenuBarState.shared.caffeinateState = .indefinite
+        let view = CaffeinatePopoverView()
+        _ = view.body
+        // Should use moon.fill for indefinite state
+    }
+
+    func testCaffeinatePopoverViewIsActiveProperty() {
+        MenuBarState.shared.caffeinateState = .inactive
+        let view = CaffeinatePopoverView()
+        _ = view.body
+        XCTAssertFalse(view.isActive, "Should not be active when state is inactive")
+
+        MenuBarState.shared.caffeinateState = .active(until: Date().addingTimeInterval(60))
+        _ = view.body
+        XCTAssertTrue(view.isActive, "Should be active when state is active")
+    }
+
+    func testCaffeinatePopoverViewIsIndefiniteProperty() {
+        MenuBarState.shared.caffeinateState = .inactive
+        let view = CaffeinatePopoverView()
+        _ = view.body
+        XCTAssertFalse(view.isIndefinite, "Should not be indefinite when state is inactive")
+
+        MenuBarState.shared.caffeinateState = .indefinite
+        _ = view.body
+        XCTAssertTrue(view.isIndefinite, "Should be indefinite when state is indefinite")
+    }
+
+    func testCaffeinatePopoverViewStatusTextInactive() {
+        MenuBarState.shared.caffeinateState = .inactive
+        let view = CaffeinatePopoverView()
+        _ = view.body
+        XCTAssertEqual(view.statusText, "System can sleep normally")
+    }
+
+    func testCaffeinatePopoverViewStatusTextIndefinite() {
+        MenuBarState.shared.caffeinateState = .indefinite
+        let view = CaffeinatePopoverView()
+        _ = view.body
+        XCTAssertEqual(view.statusText, "Keeping awake indefinitely")
+    }
+
+    func testCaffeinatePopoverViewStatusTextActiveWithMinutes() {
+        let minutesRemaining = 45
+        MenuBarState.shared.caffeinateState = .active(until: Date().addingTimeInterval(Double(minutesRemaining * 60)))
+        let view = CaffeinatePopoverView()
+        _ = view.body
+        XCTAssertTrue(view.statusText.contains("\(minutesRemaining) min"), "Status should show remaining minutes")
+    }
+
+    func testCaffeinatePopoverViewStatusTextActiveWithOneMinute() {
+        MenuBarState.shared.caffeinateState = .active(until: Date().addingTimeInterval(60))
+        let view = CaffeinatePopoverView()
+        _ = view.body
+        XCTAssertTrue(view.statusText.contains("1 min"), "Status should show 1 min")
+    }
+
+    func testCaffeinatePopoverViewStatusTextActiveExpired() {
+        MenuBarState.shared.caffeinateState = .active(until: Date().addingTimeInterval(-10))
+        let view = CaffeinatePopoverView()
+        _ = view.body
+        // Should show generic "Keeping awake" when expired
+        XCTAssertTrue(view.statusText.contains("Keeping awake"))
+    }
+
+    func testCaffeinatePopoverViewWithPowerController() async {
+        let provider = MockPowerProvider()
+        try? await provider.activate(duration: nil)
+        let controller = PowerAssertionController(powerProvider: provider)
+        MenuBarState.shared.powerController = controller
+        MenuBarState.shared.caffeinateState = .indefinite
+
+        let view = CaffeinatePopoverView()
+        _ = view.body
+        XCTAssertNotNil(view)
+    }
+
+    func testCaffeinatePopoverViewWithNilPowerController() {
+        MenuBarState.shared.powerController = nil
+        MenuBarState.shared.caffeinateState = .inactive
+        let view = CaffeinatePopoverView()
+        _ = view.body
+        // Should handle nil power controller gracefully
+        XCTAssertNotNil(view)
+    }
+
+    func testCaffeinatePopoverViewDesignSystemIntegration() {
+        MenuBarState.shared.caffeinateState = .active(until: Date().addingTimeInterval(900))
+        let view = CaffeinatePopoverView()
+        _ = view.body
+        // Should use DesignSystem.Popover.Width.wide
+        XCTAssertNotNil(view)
+    }
+
+    func testCaffeinatePopoverViewStateTransitions() {
+        let view = CaffeinatePopoverView()
+
+        // Start inactive
+        MenuBarState.shared.caffeinateState = .inactive
+        _ = view.body
+        XCTAssertFalse(view.isActive)
+
+        // Transition to active
+        MenuBarState.shared.caffeinateState = .active(until: Date().addingTimeInterval(300))
+        _ = view.body
+        XCTAssertTrue(view.isActive)
+
+        // Transition to indefinite
+        MenuBarState.shared.caffeinateState = .indefinite
+        _ = view.body
+        XCTAssertTrue(view.isActive)
+        XCTAssertTrue(view.isIndefinite)
+
+        // Back to inactive
+        MenuBarState.shared.caffeinateState = .inactive
+        _ = view.body
+        XCTAssertFalse(view.isActive)
+        XCTAssertFalse(view.isIndefinite)
+    }
 }

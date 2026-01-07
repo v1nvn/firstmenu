@@ -27,6 +27,10 @@ class MenuBarState {
     var coreCount: Int = 0
     var ramPressure: String = "Normal"
 
+    /// Caffeinate (keep-awake) state for the power controller
+    var caffeinateState: CaffeinateState = .inactive
+    var powerController: PowerAssertionController?
+
     private var statsSampler: StatsSampler?
     private var weatherSampler: WeatherSampler?
 
@@ -85,6 +89,9 @@ class MenuBarState {
         sfSymbolName = weather.sfSymbolName
         coreCount = cpuCoreCount()
         ramPressure = calculateRamPressure()
+
+        // Update caffeinate state from power controller
+        caffeinateState = powerController?.state ?? .inactive
     }
 
     private func cpuCoreCount() -> Int {
@@ -107,5 +114,9 @@ class MenuBarState {
     func setSamplers(stats: StatsSampler, weather: WeatherSampler) {
         self.statsSampler = stats
         self.weatherSampler = weather
+    }
+
+    func setPowerController(_ controller: PowerAssertionController) {
+        self.powerController = controller
     }
 }

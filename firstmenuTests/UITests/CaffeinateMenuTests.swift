@@ -101,7 +101,9 @@ final class CaffeinateMenuTests: XCTestCase {
         let provider = MockPowerProvider()
         try? await provider.activate(duration: 1800)
         let controller = PowerAssertionController(powerProvider: provider)
-        XCTAssertTrue(controller.statusText.contains("30 min"))
+        // Allow for 29 or 30 min due to timing between activation and check
+        let hasExpectedTime = controller.statusText.contains("30 min") || controller.statusText.contains("29 min")
+        XCTAssertTrue(hasExpectedTime, "Status should show approximately 30 minutes, got: \(controller.statusText)")
     }
 
     func testStatusTextForActiveStateAlmostExpired() async {

@@ -428,6 +428,129 @@ struct AppsListRowView: View {
     }
 }
 
+// MARK: - Caffeinate Popover
+
+/// Popover view for caffeinate (keep-awake) controls.
+///
+/// Displays the current keep-awake state with a visual indicator
+/// and provides quick access to preset durations.
+struct CaffeinatePopoverView: View {
+    @State private var state = MenuBarState.shared
+
+    var statusText: String {
+        switch MenuBarState.shared.caffeinateState {
+        case .inactive:
+            return "System can sleep normally"
+        case .active(let until):
+            let remaining = until.timeIntervalSinceNow
+            if remaining > 0 {
+                let minutes = Int(remaining / 60)
+                return "Keeping awake for \(minutes) min"
+            } else {
+                return "Keeping awake"
+            }
+        case .indefinite:
+            return "Keeping awake indefinitely"
+        }
+    }
+
+    var isActive: Bool {
+        MenuBarState.shared.caffeinateState.isActive
+    }
+
+    var isIndefinite: Bool {
+        MenuBarState.shared.caffeinateState.isIndefinite
+    }
+
+    var systemImageName: String {
+        switch MenuBarState.shared.caffeinateState {
+        case .inactive:
+            return "moon.zzz"
+        case .active:
+            return "moon.fill"
+        case .indefinite:
+            return "moon.fill"
+        }
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: DesignSystem.Spacing.standard) {
+            // Header with status
+            HStack {
+                HStack(spacing: 6) {
+                    Image(systemName: systemImageName)
+                        .font(.system(size: 12))
+                        .foregroundStyle(isActive ? .green : .secondary)
+                    Text("Keep Awake")
+                        .font(.system(size: 13, weight: .semibold))
+                }
+                Spacer()
+                Circle()
+                    .fill(isActive ? .green : Color.secondary.opacity(0.4))
+                    .frame(width: 8, height: 8)
+            }
+
+            // Status text
+            Text(statusText)
+                .font(.system(size: 11))
+                .foregroundStyle(.secondary)
+
+            Divider()
+
+            // Presets
+            VStack(spacing: 0) {
+                CaffeinatePresetButton(
+                    title: "15 Minutes",
+                    isActive: false,
+                    action: {
+                        Task { try? await MenuBarState.shared.powerController?.keepAwake(for: 15 * 60) }
+                    }
+                )
+
+                CaffeinatePresetButton(
+                    title: "1 Hour",
+                    isActive: false,
+                    action: {
+                        Task { try? await MenuBarState.shared.powerController?.keepAwake(for: 60 * 60) }
+                    }
+                )
+
+                CaffeinatePresetButton(
+                    title: "Indefinitely",
+                    isActive: isIndefinite,
+                    action: {
+                        Task {
+                            if isIndefinite {
+                                try? await MenuBarState.shared.powerController?.allowSleep()
+                            } else {
+                                try? await MenuBarState.shared.powerController?.keepAwakeIndefinitely()
+                            }
+                        }
+                    }
+                )
+
+                if isActive {
+                    Divider()
+                        .padding(.vertical, 4)
+
+                    Button("Disable Keep Awake") {
+                        Task { try? await MenuBarState.shared.powerController?.allowSleep() }
+                    }
+                    .buttonStyle(.borderless)
+                    .foregroundStyle(.red)
+                    .font(.caption)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                }
+            }
+        }
+        .padding()
+        .frame(width: DesignSystem.Popover.Width.wide)
+        .background(.ultraThinMaterial)
+    }
+}
+
 // MARK: - Previews
 
 #Preview("CPU") {
@@ -456,6 +579,12 @@ struct AppsListRowView: View {
 
 #Preview("Network") {
     NetworkPopoverView()
+        .padding()
+        .background(Color.black)
+}
+
+#Preview("Caffeinate") {
+    CaffeinatePopoverView()
         .padding()
         .background(Color.black)
 }

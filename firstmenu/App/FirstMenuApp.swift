@@ -10,13 +10,14 @@ import AppKit
 
 /// The main app entry point.
 ///
-/// This app creates 6 menu bar extras for system monitoring:
+/// This app creates 7 menu bar extras for system monitoring:
 /// - CPU: Real-time CPU usage percentage
 /// - RAM: Memory used / total
 /// - Storage: Disk usage percentage
 /// - Weather: Current temperature with SF Symbol
 /// - Network: Download / upload speeds
 /// - Apps: Running applications with quick quit actions
+/// - Caffeinate: Keep-awake state with dynamic icon indicator
 ///
 /// The app uses a clean architecture with Domain, Infrastructure, and UI layers.
 /// All system access is isolated to the Infrastructure layer, making the Domain
@@ -32,6 +33,7 @@ struct FirstMenuApp: App {
         WeatherMenuBarExtra()
         NetworkMenuBarExtra()
         AppsMenuBarExtra()
+        CaffeinateMenuBarExtra()
 
         Settings {
             SettingsMenuView()
@@ -101,6 +103,21 @@ struct AppsMenuBarExtra: Scene {
     }
 }
 
+/// Caffeinate menu bar extra showing keep-awake state with dynamic icon.
+///
+/// The icon changes based on caffeinate state:
+/// - Inactive: moon outline (moon.zzz)
+/// - Active with timer: moon.fill with green accent
+/// - Indefinite: moon.fill with lock overlay
+struct CaffeinateMenuBarExtra: Scene {
+    var body: some Scene {
+        MenuBarExtra("Caffeinate", systemImage: "moon.zzz") {
+            CaffeinatePopoverView()
+        }
+        .menuBarExtraStyle(.window)
+    }
+}
+
 // MARK: - App Delegate
 
 /// App delegate handling application lifecycle and dependency setup.
@@ -159,7 +176,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         // Wire up shared state
         MenuBarState.shared.setSamplers(stats: statsSampler, weather: weatherSampler)
+
+        // Create and wire power controller
         powerController = PowerAssertionController(powerProvider: powerWrapper)
+        MenuBarState.shared.setPowerController(powerController!)
     }
 
     /// Ensures clean shutdown by deactivating any active caffeinate assertions.

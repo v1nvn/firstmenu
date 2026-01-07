@@ -144,6 +144,118 @@ final class MenuBarStateTests: XCTestCase {
         state.ramPressure = "Normal"
     }
 
+    // MARK: - Caffeinate State
+
+    func testInitialCaffeinateState() {
+        let state = MenuBarState.shared
+        XCTAssertEqual(state.caffeinateState, .inactive)
+    }
+
+    func testCanUpdateCaffeinateStateToInactive() {
+        let state = MenuBarState.shared
+        state.caffeinateState = .inactive
+        XCTAssertEqual(state.caffeinateState, .inactive)
+    }
+
+    func testCanUpdateCaffeinateStateToActive() {
+        let state = MenuBarState.shared
+        let futureDate = Date().addingTimeInterval(3600)
+        state.caffeinateState = .active(until: futureDate)
+        if case .active(let until) = state.caffeinateState {
+            XCTAssertEqual(until, futureDate)
+        } else {
+            XCTFail("State should be active")
+        }
+
+        // Reset
+        state.caffeinateState = .inactive
+    }
+
+    func testCanUpdateCaffeinateStateToIndefinite() {
+        let state = MenuBarState.shared
+        state.caffeinateState = .indefinite
+        XCTAssertEqual(state.caffeinateState, .indefinite)
+
+        // Reset
+        state.caffeinateState = .inactive
+    }
+
+    func testInitialPowerController() {
+        let state = MenuBarState.shared
+        // Note: powerController may be non-nil due to shared state in parallel tests
+        // We just verify it's accessible
+        let controller = state.powerController
+        if controller != nil {
+            // If set, verify it's a valid PowerAssertionController
+            XCTAssertTrue(controller is PowerAssertionController)
+        }
+    }
+
+    func testSetPowerController() async {
+        let state = MenuBarState.shared
+        let provider = MockPowerProvider()
+        let controller = PowerAssertionController(powerProvider: provider)
+        state.setPowerController(controller)
+        XCTAssertNotNil(state.powerController)
+
+        // Reset
+        state.powerController = nil
+    }
+
+    func testCaffeinateStateIsActive() {
+        let state = MenuBarState.shared
+
+        // Inactive should not be active
+        state.caffeinateState = .inactive
+        XCTAssertFalse(state.caffeinateState.isActive)
+
+        // Active should be active
+        state.caffeinateState = .active(until: Date().addingTimeInterval(60))
+        XCTAssertTrue(state.caffeinateState.isActive)
+
+        // Indefinite should be active
+        state.caffeinateState = .indefinite
+        XCTAssertTrue(state.caffeinateState.isActive)
+
+        // Reset
+        state.caffeinateState = .inactive
+    }
+
+    func testCaffeinateStateIsIndefinite() {
+        let state = MenuBarState.shared
+
+        // Inactive is not indefinite
+        state.caffeinateState = .inactive
+        XCTAssertFalse(state.caffeinateState.isIndefinite)
+
+        // Active is not indefinite
+        state.caffeinateState = .active(until: Date().addingTimeInterval(60))
+        XCTAssertFalse(state.caffeinateState.isIndefinite)
+
+        // Indefinite is indefinite
+        state.caffeinateState = .indefinite
+        XCTAssertTrue(state.caffeinateState.isIndefinite)
+
+        // Reset
+        state.caffeinateState = .inactive
+    }
+
+    func testCaffeinateStateEquality() {
+        // Inactive equals inactive
+        XCTAssertEqual(CaffeinateState.inactive, CaffeinateState.inactive)
+
+        // Two active states with same date are equal
+        let date = Date().addingTimeInterval(100)
+        XCTAssertEqual(CaffeinateState.active(until: date), CaffeinateState.active(until: date))
+
+        // Indefinite equals indefinite
+        XCTAssertEqual(CaffeinateState.indefinite, CaffeinateState.indefinite)
+
+        // Different states are not equal
+        XCTAssertNotEqual(CaffeinateState.inactive, CaffeinateState.active(until: Date()))
+        XCTAssertNotEqual(CaffeinateState.inactive, CaffeinateState.indefinite)
+    }
+
     // MARK: - SetSamplers
 
     func testSetSamplers() async {
