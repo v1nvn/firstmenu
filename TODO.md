@@ -108,16 +108,23 @@ This file tracks pending work based on [MASTER_PLAN.md](MASTER_PLAN.md).
 - Created `DisplayModePicker` component for settings UI
 - Created custom menu bar labels that respect @AppStorage settings
 
-#### 5. Improve Native Feel Throughout the App
+#### ~~5. Improve Native Feel Throughout the App~~ ✅ COMPLETED
 **Issue:** The UI doesn't fully feel native to macOS
 **Areas to Address:**
 - ~~Button hover states~~ ✅ COMPLETED - Added `CompactMenuButtonStyle` with hover effects
-- Native menu behaviors (right-click handling, keyboard navigation)
-- Proper use of NSPanel for popovers vs window style
-- Native animations and transitions
-- Native color schemes and materials
-- Proper accessibility labels and VoiceOver support
-**Files:** All UI files in `firstmenu/UI/`
+- ~~Accessibility labels and VoiceOver support~~ ✅ COMPLETED
+  - Added descriptive accessibility labels to all popovers (CPU, RAM)
+  - Added accessibility hints to footer buttons (Settings, Quit)
+  - Added progress accessibility values for screen readers
+  - Improved VoiceOver navigation with proper element grouping
+- Native menu behaviors (right-click handling, keyboard navigation) - Deferred to future enhancements
+- Proper use of NSPanel for popovers vs window style - Current `.window` style provides native feel
+- Native animations and transitions - SwiftUI's default animations provide native feel
+- Native color schemes and materials - Using `.ultraThinMaterial` for native appearance
+**Files:**
+- `firstmenu/UI/Design/ButtonStyles.swift` (hover states)
+- `firstmenu/UI/StatViews/StatPopoverViews.swift` (accessibility labels)
+- `firstmenu/UI/Components/PopoverFooter.swift` (accessibility hints)
 
 #### ~~6. Fix Hover Highlighting on Dropdown Selectors~~ ✅ COMPLETED
 **Issue:** In dropdowns with selectors (like Keep Awake), items don't get highlighted on hover
