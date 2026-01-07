@@ -74,11 +74,6 @@ This file tracks pending work based on [MASTER_PLAN.md](MASTER_PLAN.md).
 
 ## Pending TODO
 
-### Medium Priority
-
-#### Visual Polish (Remaining)
-- [ ] Menu bar icon design (needs actual icon files — asset catalog is ready)
-
 ### Low Priority
 
 #### Release Preparation
@@ -86,9 +81,10 @@ This file tracks pending work based on [MASTER_PLAN.md](MASTER_PLAN.md).
 - [x] App Store assets guide (docs/release/app-store-assets.md)
 - [x] Privacy policy (docs/release/privacy-policy.md)
 - [x] Version tagging strategy (docs/release/version-strategy.md)
+- [x] Homebrew formula guide (docs/release/homebrew-formula.md)
+- [x] GitHub CI/CD workflow (.github/workflows/ci.yml)
+- [x] GitHub Releases automation (.github/workflows/release.yml)
 - [ ] Menu bar icon design (needs actual icon files — asset catalog is ready)
-- [ ] Homebrew formula (optional)
-- [ ] GitHub Releases automation
 
 ---
 

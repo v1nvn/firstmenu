@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Test
+    runs-on: macos-15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_16.2.app
+
+      - name: Show Xcode version
+        run: xcodebuild -version
+
+      - name: Resolve dependencies
+        run: swift package resolve
+
+      - name: Run tests
+        run: make pulse
+
+      - name: Generate test coverage
+        run: make test-stats
+
+  lint:
+    name: Lint
+    runs-on: macos-15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve dependencies
+        run: swift package resolve
+
+      - name: Run SwiftLint
+        run: make lint
+
+  build:
+    name: Build
+    runs-on: macos-15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_16.2.app
+
+      - name: Build
+        run: make build
