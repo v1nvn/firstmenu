@@ -81,10 +81,11 @@ This file tracks pending work based on [MASTER_PLAN.md](MASTER_PLAN.md).
 ### Low Priority
 
 #### Release Preparation
-- [ ] Code signing setup
-- [ ] App Store assets (icons, screenshots)
-- [ ] Privacy policy (if collecting any data)
-- [ ] Version tagging strategy
+- [x] Code signing setup (docs/release/code-signing.md)
+- [x] App Store assets guide (docs/release/app-store-assets.md)
+- [x] Privacy policy (docs/release/privacy-policy.md)
+- [x] Version tagging strategy (docs/release/version-strategy.md)
+- [ ] Menu bar icon design (needs actual icon files — asset catalog is ready)
 - [ ] Homebrew formula (optional)
 - [ ] GitHub Releases automation
 
