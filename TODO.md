@@ -40,10 +40,10 @@ This file tracks pending work based on [MASTER_PLAN.md](MASTER_PLAN.md).
 - [x] Settings scene wired to SettingsMenuView
 
 ### Testing
-- [x] **329 tests** across 28 test files
+- [x] **357 tests** across 28 test files
 - [x] Domain tests: 25 tests (100% coverage)
 - [x] Infrastructure tests: 100 tests (~95% coverage)
-- [x] UI tests: 197 tests
+- [x] UI tests: 225 tests
 - [x] Integration tests: 7 tests
 - [x] Mock providers for all infrastructure
 - [x] Graceful error handling tests
@@ -77,7 +77,6 @@ This file tracks pending work based on [MASTER_PLAN.md](MASTER_PLAN.md).
 
 #### Visual Polish (Remaining)
 - [ ] Menu bar icon design (needs actual icon files — asset catalog is ready)
-- [ ] Caffeinate state indicator in menu bar icon
 
 ### Low Priority
 
@@ -119,14 +118,14 @@ make run          # Build and launch the app
 ```
 
 ### Test Stats
-- **Total Tests:** 329
+- **Total Tests:** 357
 - **Domain:** 25 tests (100% coverage)
 - **Infrastructure:** 100 tests (~95% coverage)
-- **UI:** 197 tests
+- **UI:** 225 tests
 - **Integration:** 7 tests
 - **Test Files:** 28
 
 ### File Count
 - **Source files:** 33
 - **Test files:** 28
-- **Lines of code:** ~6,800 (estimate)
+- **Lines of code:** ~7,000 (estimate)
