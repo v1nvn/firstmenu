@@ -30,6 +30,11 @@ struct CPUStatLabelView: View {
     let percentage: Double
     var displayMode: MenuBarDisplayMode = .value
 
+    private var safePercentage: Int {
+        guard percentage.isFinite else { return 0 }
+        return max(0, min(100, Int(percentage)))
+    }
+
     var body: some View {
         switch displayMode {
         case .icon:
@@ -37,13 +42,13 @@ struct CPUStatLabelView: View {
                 .font(.system(size: DesignSystem.MenuBar.iconSize))
                 .foregroundStyle(DesignSystem.Colors.menuBarText)
         case .value:
-            Text("\(Int(percentage))%")
+            Text("\(safePercentage)%")
                 .menuBarMonospaced()
         case .both:
             HStack(spacing: DesignSystem.Spacing.tight) {
                 Image(systemName: "cpu")
                     .font(.system(size: DesignSystem.MenuBar.iconSize))
-                Text("\(Int(percentage))%")
+                Text("\(safePercentage)%")
                     .menuBarMonospaced()
             }
         }
@@ -62,7 +67,8 @@ struct RAMStatLabelView: View {
     }
 
     private var percentage: Int {
-        Int(Double(used) / Double(total) * 100)
+        guard total > 0 else { return 0 }
+        return Int(Double(used) / Double(total) * 100)
     }
 
     var body: some View {
@@ -93,7 +99,8 @@ struct SSDStatLabelView: View {
     var displayMode: MenuBarDisplayMode = .value
 
     private var percentage: Int {
-        Int(Double(used) / Double(total) * 100)
+        guard total > 0 else { return 0 }
+        return Int(Double(used) / Double(total) * 100)
     }
 
     var body: some View {
@@ -123,6 +130,11 @@ struct WeatherStatLabelView: View {
     let sfSymbolName: String
     var displayMode: MenuBarDisplayMode = .both
 
+    private var safeTemperature: Int {
+        guard temperature.isFinite else { return 0 }
+        return Int(temperature)
+    }
+
     var body: some View {
         switch displayMode {
         case .icon:
@@ -130,13 +142,13 @@ struct WeatherStatLabelView: View {
                 .font(.system(size: DesignSystem.MenuBar.iconSize))
                 .foregroundStyle(DesignSystem.Colors.menuBarText)
         case .value:
-            Text("\(Int(temperature))°")
+            Text("\(safeTemperature)°")
                 .menuBarMonospaced()
         case .both:
             HStack(spacing: DesignSystem.Spacing.tight) {
                 Image(systemName: sfSymbolName)
                     .font(.system(size: DesignSystem.MenuBar.iconSize))
-                Text("\(Int(temperature))°")
+                Text("\(safeTemperature)°")
                     .menuBarMonospaced()
             }
         }

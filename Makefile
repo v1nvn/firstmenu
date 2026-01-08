@@ -87,7 +87,21 @@ watch:
 # Run the app
 run:
 	@echo "Launching firstmenu..."
-	xcodebuild -scheme firstmenu build && open ~/Library/Developer/Xcode/DerivedData/firstmenu-*/Build/Products/Debug/firstmenu.app
+	@APP_PATH=$$(xcodebuild -scheme firstmenu -showBuildSettings 2>/dev/null | grep -m1 "BUILT_PRODUCTS_DIR" | awk '{print $$NF}')/firstmenu.app; \
+	if [ -d "$$APP_PATH" ]; then \
+		echo "Building..."; \
+		xcodebuild -scheme firstmenu -configuration Debug build >/dev/null 2>&1 && \
+		pkill -x firstmenu 2>/dev/null; sleep 0.5; \
+		echo "Opening $$APP_PATH"; \
+		open "$$APP_PATH"; \
+	else \
+		echo "Building..."; \
+		xcodebuild -scheme firstmenu -configuration Debug build && \
+		pkill -x firstmenu 2>/dev/null; sleep 0.5; \
+		APP_PATH=$$(xcodebuild -scheme firstmenu -showBuildSettings 2>/dev/null | grep -m1 "BUILT_PRODUCTS_DIR" | awk '{print $$NF}')/firstmenu.app; \
+		echo "Opening $$APP_PATH"; \
+		open "$$APP_PATH"; \
+	fi
 
 # Show help
 help:
