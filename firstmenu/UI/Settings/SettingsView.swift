@@ -2,34 +2,62 @@
 //  SettingsView.swift
 //  firstmenu
 //
-//  Native macOS settings view using TabView
+//  Native macOS settings view using sidebar navigation
 //
 
 import SwiftUI
 
+// MARK: - Settings Navigation
+
+enum SettingsTab: String, CaseIterable, Identifiable {
+    case general
+    case display
+    case about
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .general: return "General"
+        case .display: return "Display"
+        case .about: return "About"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .general: return "gearshape"
+        case .display: return "rectangle.on.rectangle"
+        case .about: return "info.circle"
+        }
+    }
+}
+
 // MARK: - Main Settings View
 
-/// Native macOS settings view using TabView for categories.
-/// This follows Apple's recommended pattern for app settings on macOS.
+/// Native macOS settings view using sidebar navigation.
+/// This follows Apple's System Settings pattern for macOS 26+.
 struct SettingsView: View {
+    @State private var selectedTab: SettingsTab = .general
+
     var body: some View {
-        TabView {
-            GeneralSettingsView()
-                .tabItem {
-                    Label("General", systemImage: "gearshape")
-                }
-
-            DisplaySettingsView()
-                .tabItem {
-                    Label("Display", systemImage: "rectangle.on.rectangle")
-                }
-
-            AboutSettingsView()
-                .tabItem {
-                    Label("About", systemImage: "info.circle")
-                }
+        NavigationSplitView {
+            List(SettingsTab.allCases, selection: $selectedTab) { tab in
+                Label(tab.title, systemImage: tab.icon)
+                    .tag(tab)
+            }
+            .navigationSplitViewColumnWidth(min: 180, ideal: 200)
+        } detail: {
+            switch selectedTab {
+            case .general:
+                GeneralSettingsView()
+            case .display:
+                DisplaySettingsView()
+            case .about:
+                AboutSettingsView()
+            }
         }
-        .frame(minWidth: 500, minHeight: 350)
+        .frame(minWidth: 600, minHeight: 400)
     }
 }
 
@@ -55,7 +83,8 @@ struct GeneralSettingsView: View {
             }
         }
         .formStyle(.grouped)
-        .navigationSplitViewColumnWidth(min: 350, ideal: 400)
+        .navigationTitle("General")
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 
@@ -87,26 +116,28 @@ struct DisplaySettingsView: View {
             }
 
             Section {
-                displayModePicker(title: "CPU", icon: "cpu", selection: $cpuDisplayMode)
-                displayModePicker(title: "Memory", icon: "memorychip", selection: $ramDisplayMode)
-                displayModePicker(title: "Storage", icon: "internaldrive", selection: $storageDisplayMode)
-                displayModePicker(title: "Weather", icon: "cloud.sun", selection: $weatherDisplayMode)
-                displayModePicker(title: "Network", icon: "network", selection: $networkDisplayMode)
+                displayModePicker(title: "CPU", selection: $cpuDisplayMode)
+                displayModePicker(title: "Memory", selection: $ramDisplayMode)
+                displayModePicker(title: "Storage", selection: $storageDisplayMode)
+                displayModePicker(title: "Weather", selection: $weatherDisplayMode)
+                displayModePicker(title: "Network", selection: $networkDisplayMode)
             } header: {
                 Text("Display Mode")
             }
         }
         .formStyle(.grouped)
+        .navigationTitle("Display")
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     @ViewBuilder
-    private func displayModePicker(title: String, icon: String, selection: Binding<String>) -> some View {
+    private func displayModePicker(title: String, selection: Binding<String>) -> some View {
         Picker(title, selection: selection) {
             Text("Icon").tag(MenuBarDisplayMode.icon.rawValue)
             Text("Value").tag(MenuBarDisplayMode.value.rawValue)
             Text("Both").tag(MenuBarDisplayMode.both.rawValue)
         }
-        .pickerStyle(.radioGroup)
+        .pickerStyle(.segmented)
     }
 }
 
@@ -124,21 +155,28 @@ struct AboutSettingsView: View {
     var body: some View {
         Form {
             Section {
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("firstmenu")
-                        .font(.title)
-                        .fontWeight(.semibold)
-
-                    Text("Version \(version) (\(build))")
-                        .font(.body)
-                        .foregroundStyle(.secondary)
-
-                    Text("A minimal macOS menu bar system companion")
-                        .font(.body)
-                        .foregroundStyle(.secondary)
+                HStack(spacing: 16) {
+                    if let appIcon = NSApplication.shared.applicationIconImage {
+                        Image(nsImage: appIcon)
+                            .resizable()
+                            .frame(width: 64, height: 64)
+                    }
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("firstmenu")
+                            .font(.title2)
+                            .fontWeight(.semibold)
+                        Text("Version \(version) (\(build))")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.vertical, 8)
+            }
+
+            Section {
+                Text("A minimal macOS menu bar system companion")
+                    .foregroundStyle(.secondary)
             }
 
             Section {
@@ -149,13 +187,14 @@ struct AboutSettingsView: View {
             }
 
             Section {
-                Button("Quit firstmenu") {
+                Button("Quit firstmenu", role: .destructive) {
                     NSApplication.shared.terminate(nil)
                 }
-                .controlSize(.large)
             }
         }
         .formStyle(.grouped)
+        .navigationTitle("About")
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 

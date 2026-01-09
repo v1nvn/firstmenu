@@ -1,7 +1,7 @@
 # firstmenu Makefile
 # CLI-first development interface
 
-.PHONY: all build clean test lint lint-fix format probe watch run help setup-lint
+.PHONY: all build clean test lint lint-fix format probe watch run stop help setup-lint
 
 # SwiftLint cache location
 SWIFTLINT_CACHE=$(HOME)/Library/Caches/com.firstmenu.SwiftLint
@@ -103,6 +103,15 @@ run:
 		open "$$APP_PATH"; \
 	fi
 
+# Stop the app
+stop:
+	@echo "Stopping firstmenu..."
+	@if pkill -x firstmenu 2>/dev/null; then \
+		echo "firstmenu stopped."; \
+	else \
+		echo "firstmenu was not running."; \
+	fi
+
 # Show help
 help:
 	@echo "firstmenu - Makefile targets"
@@ -120,4 +129,5 @@ help:
 	@echo "  make test-stats - Show test statistics"
 	@echo "  make watch     - Auto-run lint and tests on file changes"
 	@echo "  make run       - Build and launch the app"
+	@echo "  make stop      - Stop the running app"
 	@echo "  make help      - Show this help message"

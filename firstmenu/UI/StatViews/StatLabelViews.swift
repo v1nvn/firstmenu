@@ -40,7 +40,7 @@ struct CPUStatLabelView: View {
         case .icon:
             Image(systemName: "cpu")
                 .font(.system(size: DesignSystem.MenuBar.iconSize))
-                .foregroundStyle(DesignSystem.Colors.menuBarText)
+                .foregroundStyle(.primary)
         case .value:
             Text("\(safePercentage)%")
                 .menuBarMonospaced()
@@ -76,7 +76,7 @@ struct RAMStatLabelView: View {
         case .icon:
             Image(systemName: "memorychip")
                 .font(.system(size: DesignSystem.MenuBar.iconSize))
-                .foregroundStyle(DesignSystem.Colors.menuBarText)
+                .foregroundStyle(.primary)
         case .value:
             Text("\(usedGB)G")
                 .menuBarMonospaced()
@@ -108,7 +108,7 @@ struct SSDStatLabelView: View {
         case .icon:
             Image(systemName: "internaldrive")
                 .font(.system(size: DesignSystem.MenuBar.iconSize))
-                .foregroundStyle(DesignSystem.Colors.menuBarText)
+                .foregroundStyle(.primary)
         case .value:
             Text("\(percentage)%")
                 .menuBarMonospaced()
@@ -140,7 +140,7 @@ struct WeatherStatLabelView: View {
         case .icon:
             Image(systemName: sfSymbolName)
                 .font(.system(size: DesignSystem.MenuBar.iconSize))
-                .foregroundStyle(DesignSystem.Colors.menuBarText)
+                .foregroundStyle(.primary)
         case .value:
             Text("\(safeTemperature)°")
                 .menuBarMonospaced()
@@ -182,7 +182,7 @@ struct NetworkStatLabelView: View {
         case .icon:
             Image(systemName: isActive ? "antenna.radiowaves.left.and.right" : "network.slash")
                 .font(.system(size: DesignSystem.MenuBar.iconSize))
-                .foregroundStyle(isActive ? DesignSystem.Colors.menuBarText : DesignSystem.Colors.menuBarTextDimmed)
+                .foregroundStyle(isActive ? .primary : .secondary)
         case .value:
             Group {
                 if isActive {
@@ -192,7 +192,7 @@ struct NetworkStatLabelView: View {
                 }
             }
             .menuBarMonospaced()
-            .foregroundStyle(isActive ? DesignSystem.Colors.menuBarText : DesignSystem.Colors.menuBarTextDimmed)
+            .foregroundStyle(isActive ? .primary : .secondary)
         case .both:
             HStack(spacing: DesignSystem.Spacing.tight) {
                 Image(systemName: isActive ? "antenna.radiowaves.left.and.right" : "network.slash")
@@ -204,7 +204,7 @@ struct NetworkStatLabelView: View {
                 }
             }
             .menuBarMonospaced()
-            .foregroundStyle(isActive ? DesignSystem.Colors.menuBarText : DesignSystem.Colors.menuBarTextDimmed)
+            .foregroundStyle(isActive ? .primary : .secondary)
         }
     }
 }
@@ -217,7 +217,7 @@ struct AppsIconView: View {
     var body: some View {
         Image(systemName: "app.dashed")
             .font(.system(size: DesignSystem.MenuBar.iconSize))
-            .foregroundStyle(DesignSystem.Colors.menuBarText)
+            .foregroundStyle(.primary)
     }
 }
 

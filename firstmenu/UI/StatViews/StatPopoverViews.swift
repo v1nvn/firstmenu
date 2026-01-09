@@ -12,46 +12,23 @@ import SwiftUI
 struct CPUPopoverView: View {
     @State private var state = MenuBarState.shared
 
-    var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            VStack(alignment: .leading, spacing: DesignSystem.Spacing.standard) {
-                HStack {
-                    Text("CPU")
-                        .font(.system(size: 13, weight: .semibold))
-                    Spacer()
-                    Text("\(Int(state.cpuPercentage))%")
-                        .font(.system(size: 13, weight: .medium).monospacedDigit())
-                        .foregroundStyle(DesignSystem.Colors.progressColor(for: state.cpuPercentage))
-                }
-                .accessibilityElement(children: .combine)
-                .accessibilityLabel("CPU usage: \(Int(state.cpuPercentage)) percent")
+    private var progressColor: Color {
+        DesignSystem.Colors.progressColor(for: state.cpuPercentage)
+    }
 
-                ProgressView(value: state.cpuPercentage / 100)
-                    .progressViewStyle(.linear)
-                    .tint(DesignSystem.Colors.progressColor(for: state.cpuPercentage))
-                    .accessibilityLabel("CPU usage progress")
+    var body: some View {
+        PopoverContainer(width: 200) {
+            PopoverSection {
+                PopoverHeader("CPU", systemImage: "cpu", value: "\(Int(state.cpuPercentage))%", valueColor: progressColor)
+                    .accessibilityLabel("CPU usage: \(Int(state.cpuPercentage)) percent")
+
+                StatGaugeRow(value: state.cpuPercentage, tintColor: progressColor)
+                    .accessibilityLabel("CPU usage")
                     .accessibilityValue("\(Int(state.cpuPercentage)) percent")
 
-                HStack {
-                    Text("Cores")
-                        .font(.system(size: 11))
-                        .foregroundStyle(.secondary)
-                    Spacer()
-                    Text("\(state.coreCount)")
-                        .font(.system(size: 11).monospacedDigit())
-                        .foregroundStyle(.secondary)
-                }
-                .accessibilityElement(children: .combine)
-                .accessibilityLabel("\(state.coreCount) CPU cores")
+                InfoRow(label: "Cores", value: "\(state.coreCount)")
             }
-            .padding()
-
-            Divider()
-
-            PopoverFooter()
         }
-        .frame(width: DesignSystem.Popover.Width.standard)
-        .background(.ultraThinMaterial)
         .accessibilityElement(children: .contain)
         .accessibilityLabel("CPU usage panel")
     }
@@ -71,45 +48,27 @@ struct RAMPopoverView: View {
     }
 
     private var percentage: Double {
-        Double(state.ramUsed) / Double(state.ramTotal) * 100
+        guard state.ramTotal > 0 else { return 0 }
+        return Double(state.ramUsed) / Double(state.ramTotal) * 100
+    }
+
+    private var progressColor: Color {
+        DesignSystem.Colors.progressColor(for: percentage)
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            VStack(alignment: .leading, spacing: DesignSystem.Spacing.standard) {
-                HStack {
-                    Text("Memory")
-                        .font(.system(size: 13, weight: .semibold))
-                    Spacer()
-                    Text("\(Int(percentage))%")
-                        .font(.system(size: 13, weight: .medium).monospacedDigit())
-                        .foregroundStyle(DesignSystem.Colors.progressColor(for: percentage))
-                }
-                .accessibilityElement(children: .combine)
-                .accessibilityLabel("Memory usage: \(Int(percentage)) percent")
+        PopoverContainer {
+            PopoverSection {
+                PopoverHeader("Memory", systemImage: "memorychip", value: "\(Int(percentage))%", valueColor: progressColor)
+                    .accessibilityLabel("Memory usage: \(Int(percentage)) percent")
 
-                ProgressView(value: percentage / 100)
-                    .progressViewStyle(.linear)
-                    .tint(DesignSystem.Colors.progressColor(for: percentage))
-                    .accessibilityLabel("Memory usage progress")
+                StatGaugeRow(value: percentage, tintColor: progressColor)
+                    .accessibilityLabel("Memory usage")
                     .accessibilityValue("\(Int(percentage)) percent")
 
-                HStack {
-                    Text(String(format: "%.1f of %.1f GB", usedGB, totalGB))
-                        .font(.system(size: 11))
-                        .foregroundStyle(.secondary)
-                    Spacer()
-                }
-                .accessibilityLabel("\(String(format: "%.1f", usedGB)) gigabytes used of \(String(format: "%.1f", totalGB)) gigabytes total")
+                InfoRow(label: "Used", value: String(format: "%.1f of %.1f GB", usedGB, totalGB))
             }
-            .padding()
-
-            Divider()
-
-            PopoverFooter()
         }
-        .frame(width: DesignSystem.Popover.Width.wide)
-        .background(.ultraThinMaterial)
         .accessibilityElement(children: .contain)
         .accessibilityLabel("Memory usage panel")
     }
@@ -129,40 +88,24 @@ struct StoragePopoverView: View {
     }
 
     private var percentage: Double {
-        Double(state.storageUsed) / Double(state.storageTotal) * 100
+        guard state.storageTotal > 0 else { return 0 }
+        return Double(state.storageUsed) / Double(state.storageTotal) * 100
+    }
+
+    private var progressColor: Color {
+        DesignSystem.Colors.progressColor(for: percentage, thresholds: (80, 95))
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            VStack(alignment: .leading, spacing: DesignSystem.Spacing.standard) {
-                HStack {
-                    Text("Storage")
-                        .font(.system(size: 13, weight: .semibold))
-                    Spacer()
-                    Text("\(Int(percentage))%")
-                        .font(.system(size: 13, weight: .medium).monospacedDigit())
-                        .foregroundStyle(DesignSystem.Colors.progressColor(for: percentage, thresholds: (80, 95)))
-                }
+        PopoverContainer {
+            PopoverSection {
+                PopoverHeader("Storage", systemImage: "internaldrive", value: "\(Int(percentage))%", valueColor: progressColor)
 
-                ProgressView(value: percentage / 100)
-                    .progressViewStyle(.linear)
-                    .tint(DesignSystem.Colors.progressColor(for: percentage, thresholds: (80, 95)))
+                StatGaugeRow(value: percentage, tintColor: progressColor)
 
-                HStack {
-                    Text(String(format: "%.0f of %.0f GB free", totalGB - usedGB, totalGB))
-                        .font(.system(size: 11))
-                        .foregroundStyle(.secondary)
-                    Spacer()
-                }
+                InfoRow(label: "Available", value: String(format: "%.0f of %.0f GB", totalGB - usedGB, totalGB))
             }
-            .padding()
-
-            Divider()
-
-            PopoverFooter()
         }
-        .frame(width: DesignSystem.Popover.Width.wide)
-        .background(.ultraThinMaterial)
     }
 }
 
@@ -190,37 +133,27 @@ struct WeatherPopoverView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            VStack(alignment: .leading, spacing: DesignSystem.Spacing.standard) {
+        PopoverContainer {
+            PopoverSection {
                 HStack {
-                    Text("Weather")
-                        .font(.system(size: 13, weight: .semibold))
+                    Label("Weather", systemImage: "cloud.sun")
+                        .font(.headline)
                     Spacer()
-                    HStack(spacing: DesignSystem.Spacing.tight) {
+                    HStack(spacing: 4) {
                         Image(systemName: state.sfSymbolName)
+                            .symbolRenderingMode(.multicolor)
                         Text("\(Int(state.temperature))°")
-                            .font(.system(size: 13, weight: .medium).monospacedDigit())
+                            .font(.system(.title2, design: .rounded, weight: .medium))
                     }
                 }
 
-                HStack {
-                    Text(conditionText)
-                        .font(.system(size: 11))
-                        .foregroundStyle(.secondary)
-                    Spacer()
-                    Text("IP-based")
-                        .font(.system(size: 10))
-                        .foregroundStyle(.tertiary)
-                }
+                InfoRow(label: "Condition", value: conditionText)
+
+                Text("Location detected via IP address")
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
             }
-            .padding()
-
-            Divider()
-
-            PopoverFooter()
         }
-        .frame(width: DesignSystem.Popover.Width.wide)
-        .background(.ultraThinMaterial)
     }
 }
 
@@ -241,53 +174,46 @@ struct NetworkPopoverView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            VStack(alignment: .leading, spacing: DesignSystem.Spacing.standard) {
-                HStack {
-                    Text("Network")
-                        .font(.system(size: 13, weight: .semibold))
-                    Spacer()
-                }
+        PopoverContainer {
+            PopoverSection {
+                Label("Network", systemImage: "network")
+                    .font(.headline)
 
-                HStack {
-                    Image(systemName: "arrow.down")
-                        .font(.system(size: 10))
-                        .foregroundStyle(.secondary)
-                    Text(formatSpeed(state.downloadBPS))
-                        .font(.system(size: 12, weight: .medium).monospacedDigit())
-                    Spacer()
+                Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 6) {
+                    GridRow {
+                        Image(systemName: "arrow.down.circle.fill")
+                            .foregroundStyle(.green)
+                        Text("Download")
+                            .foregroundStyle(.secondary)
+                        Text(formatSpeed(state.downloadBPS))
+                            .font(.system(.body, design: .monospaced))
+                            .frame(maxWidth: .infinity, alignment: .trailing)
+                    }
+                    GridRow {
+                        Image(systemName: "arrow.up.circle.fill")
+                            .foregroundStyle(.blue)
+                        Text("Upload")
+                            .foregroundStyle(.secondary)
+                        Text(formatSpeed(state.uploadBPS))
+                            .font(.system(.body, design: .monospaced))
+                            .frame(maxWidth: .infinity, alignment: .trailing)
+                    }
                 }
-
-                HStack {
-                    Image(systemName: "arrow.up")
-                        .font(.system(size: 10))
-                        .foregroundStyle(.secondary)
-                    Text(formatSpeed(state.uploadBPS))
-                        .font(.system(size: 12, weight: .medium).monospacedDigit())
-                    Spacer()
-                }
+                .font(.subheadline)
 
                 if state.downloadBPS == 0 && state.uploadBPS == 0 {
-                    Text("No activity")
-                        .font(.system(size: 11))
+                    Text("No network activity")
+                        .font(.caption)
                         .foregroundStyle(.tertiary)
                 }
             }
-            .padding()
-
-            Divider()
-
-            PopoverFooter()
         }
-        .frame(width: DesignSystem.Popover.Width.standard)
-        .background(.ultraThinMaterial)
     }
 }
 
 // MARK: - Apps Popover
 
 struct AppsPopoverView: View {
-    @State private var state = MenuBarState.shared
     @State private var appManager = AppProcessManager(appLister: NSWorkspaceAppLister())
     @State private var powerController = PowerAssertionController(powerProvider: CaffeinateWrapper())
     @State private var showingQuitAllAlert = false
@@ -296,46 +222,48 @@ struct AppsPopoverView: View {
         VStack(alignment: .leading, spacing: 0) {
             // Header
             HStack {
-                Text("Running Apps")
-                    .font(.system(size: 13, weight: .semibold))
+                Label("Running Apps", systemImage: "app.badge")
+                    .font(.headline)
                 Spacer()
                 if !appManager.isLoading && !appManager.runningApps.isEmpty {
                     Text("\(appManager.appCount)")
-                        .font(.system(size: 11, weight: .medium).monospacedDigit())
+                        .font(.subheadline.monospacedDigit())
                         .foregroundStyle(.secondary)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 2)
+                        .background(.quaternary, in: Capsule())
                 }
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
+            .padding()
 
             if appManager.isLoading {
                 ProgressView()
+                    .controlSize(.small)
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding()
             } else if appManager.runningApps.isEmpty {
-                Text("No running apps")
-                    .font(.system(size: 11))
-                    .foregroundStyle(.secondary)
-                    .padding()
+                PopoverEmptyState("No Apps", systemImage: "app.dashed", description: "No user apps running")
             } else {
-                // Apps list
-                ForEach(appManager.runningApps) { app in
-                    AppsListRowView(app: app, onQuit: {
-                        Task { try? await appManager.quitApp(bundleIdentifier: app.bundleIdentifier ?? "") }
-                    })
+                ScrollView {
+                    LazyVStack(spacing: 0) {
+                        ForEach(appManager.runningApps) { app in
+                            AppsListRowView(app: app, onQuit: {
+                                Task { try? await appManager.quitApp(bundleIdentifier: app.bundleIdentifier ?? "") }
+                            })
+                        }
+                    }
                 }
+                .frame(maxHeight: 200)
 
-                // Quit All button
-                Button("Quit All Apps") {
+                Button("Quit All Apps", role: .destructive) {
                     showingQuitAllAlert = true
                 }
-                .buttonStyle(.borderless)
-                .foregroundStyle(.red.opacity(0.9))
-                .font(.system(size: 11))
+                .buttonStyle(.plain)
+                .font(.subheadline)
+                .foregroundStyle(.red)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 12)
-                .padding(.top, 4)
-                .padding(.bottom, 10)
+                .padding(.horizontal)
+                .padding(.vertical, 8)
                 .confirmationDialog(
                     "Quit all running applications?",
                     isPresented: $showingQuitAllAlert,
@@ -350,93 +278,62 @@ struct AppsPopoverView: View {
                 }
             }
 
-            // Caffeinate section - separated by opacity instead of divider
-            VStack(spacing: 0) {
+            Divider()
+
+            // Keep Awake section
+            VStack(alignment: .leading, spacing: 8) {
                 HStack {
-                    Text("Keep Awake")
-                        .font(.system(size: 12, weight: .semibold))
+                    Label("Keep Awake", systemImage: powerController.isActive ? "moon.fill" : "moon.zzz")
+                        .font(.subheadline.weight(.medium))
                         .foregroundStyle(.secondary)
                     Spacer()
-                    Circle()
-                        .fill(powerController.isActive ? .green : Color.secondary.opacity(0.4))
-                        .frame(width: 6, height: 6)
+                    StatusIndicator(isActive: powerController.isActive)
                 }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 10)
-                .padding(.bottom, 4)
 
-                CaffeinatePresetButton(
-                    title: "15 min",
-                    isActive: false,
-                    action: {
-                        Task { try? await powerController.keepAwake(for: 15 * 60) }
-                    }
-                )
-                CaffeinatePresetButton(
-                    title: "1 hour",
-                    isActive: false,
-                    action: {
-                        Task { try? await powerController.keepAwake(for: 60 * 60) }
-                    }
-                )
-                CaffeinatePresetButton(
-                    title: "Indefinitely",
-                    isActive: powerController.isIndefinite,
-                    action: {
-                        Task {
-                            if powerController.isIndefinite {
-                                try? await powerController.allowSleep()
-                            } else {
-                                try? await powerController.keepAwakeIndefinitely()
+                HStack(spacing: 8) {
+                    ForEach(["15m", "1h", "∞"], id: \.self) { preset in
+                        Button(preset) {
+                            Task {
+                                switch preset {
+                                case "15m": try? await powerController.keepAwake(for: 15 * 60)
+                                case "1h": try? await powerController.keepAwake(for: 60 * 60)
+                                case "∞":
+                                    if powerController.isIndefinite {
+                                        try? await powerController.allowSleep()
+                                    } else {
+                                        try? await powerController.keepAwakeIndefinitely()
+                                    }
+                                default: break
+                                }
                             }
                         }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+                        .tint(preset == "∞" && powerController.isIndefinite ? .green : nil)
                     }
-                )
-                if powerController.isActive {
-                    Button("Disable") {
-                        Task { try? await powerController.allowSleep() }
+
+                    if powerController.isActive && !powerController.isIndefinite {
+                        Button("Off") {
+                            Task { try? await powerController.allowSleep() }
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+                        .tint(.red)
                     }
-                    .buttonStyle(.borderless)
-                    .foregroundStyle(.red.opacity(0.9))
-                    .font(.system(size: 11))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
                 }
             }
-            .background(Color.black.opacity(0.03))
+            .padding()
+            .background(.quinary)
 
             Divider()
 
             PopoverFooter()
         }
-        .frame(width: 240)
-        .background(.ultraThinMaterial)
+        .frame(width: 260)
+        .background(.regularMaterial)
         .onAppear {
             Task { await appManager.refresh() }
         }
-    }
-}
-
-struct CaffeinatePresetButton: View {
-    let title: String
-    let isActive: Bool
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            HStack {
-                Text(title)
-                    .font(.system(size: 12))
-                Spacer()
-                if isActive {
-                    Image(systemName: "checkmark")
-                        .font(.system(size: 10, weight: .semibold))
-                        .foregroundStyle(.green)
-                }
-            }
-        }
-        .compactMenuButtonStyle()
     }
 }
 
@@ -445,27 +342,33 @@ struct CaffeinatePresetButton: View {
 struct AppsListRowView: View {
     let app: AppProcess
     let onQuit: () -> Void
+    @State private var isHovering = false
 
     var body: some View {
-        HStack(spacing: 6) {
-            Image(systemName: "app.dashed")
-                .font(.system(size: 11))
+        HStack(spacing: 8) {
+            Image(systemName: "app.fill")
+                .font(.subheadline)
                 .foregroundStyle(.secondary)
             Text(app.name)
-                .font(.system(size: 12))
+                .font(.subheadline)
                 .lineLimit(1)
             Spacer()
             Button(action: onQuit) {
                 Image(systemName: "xmark.circle.fill")
-                    .font(.system(size: 13))
-                    .foregroundStyle(.secondary.opacity(0.7))
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
             }
-            .buttonStyle(.borderless)
+            .buttonStyle(.plain)
+            .opacity(isHovering ? 1 : 0.5)
             .help("Quit \(app.name)")
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 4)
+        .padding(.horizontal)
+        .padding(.vertical, 6)
+        .background(isHovering ? Color.primary.opacity(0.05) : Color.clear)
         .contentShape(Rectangle())
+        .onHover { hovering in
+            isHovering = hovering
+        }
         .contextMenu {
             Button("Quit", role: .destructive) {
                 onQuit()
@@ -477,14 +380,11 @@ struct AppsListRowView: View {
 // MARK: - Caffeinate Popover
 
 /// Popover view for caffeinate (keep-awake) controls.
-///
-/// Displays the current keep-awake state with a visual indicator
-/// and provides quick access to preset durations.
 struct CaffeinatePopoverView: View {
     @State private var state = MenuBarState.shared
 
-    var statusText: String {
-        switch MenuBarState.shared.caffeinateState {
+    private var statusText: String {
+        switch state.caffeinateState {
         case .inactive:
             return "System can sleep normally"
         case .active(let until):
@@ -500,106 +400,75 @@ struct CaffeinatePopoverView: View {
         }
     }
 
-    var isActive: Bool {
-        MenuBarState.shared.caffeinateState.isActive
+    private var isActive: Bool {
+        state.caffeinateState.isActive
     }
 
-    var isIndefinite: Bool {
-        MenuBarState.shared.caffeinateState.isIndefinite
+    private var isIndefinite: Bool {
+        state.caffeinateState.isIndefinite
     }
 
-    var systemImageName: String {
-        switch MenuBarState.shared.caffeinateState {
-        case .inactive:
-            return "moon.zzz"
-        case .active:
-            return "moon.fill"
-        case .indefinite:
-            return "moon.fill"
-        }
+    private var systemImageName: String {
+        isActive ? "moon.fill" : "moon.zzz"
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            VStack(alignment: .leading, spacing: DesignSystem.Spacing.standard) {
+        PopoverContainer {
+            PopoverSection(spacing: 12) {
                 // Header with status
                 HStack {
-                    HStack(spacing: 6) {
-                        Image(systemName: systemImageName)
-                            .font(.system(size: 12))
-                            .foregroundStyle(isActive ? .green : .secondary)
-                        Text("Keep Awake")
-                            .font(.system(size: 13, weight: .semibold))
-                    }
+                    Label("Keep Awake", systemImage: systemImageName)
+                        .font(.headline)
+                        .symbolRenderingMode(.hierarchical)
+                        .foregroundStyle(isActive ? .green : .primary)
                     Spacer()
-                    Circle()
-                        .fill(isActive ? .green : Color.secondary.opacity(0.4))
-                        .frame(width: 8, height: 8)
+                    StatusIndicator(isActive: isActive)
                 }
 
                 // Status text
                 Text(statusText)
-                    .font(.system(size: 11))
+                    .font(.subheadline)
                     .foregroundStyle(.secondary)
 
                 Divider()
 
-                // Presets
-                VStack(spacing: 0) {
-                    CaffeinatePresetButton(
-                        title: "15 Minutes",
-                        isActive: false,
-                        action: {
-                            Task { try? await MenuBarState.shared.powerController?.keepAwake(for: 15 * 60) }
-                        }
-                    )
+                // Duration presets
+                VStack(alignment: .leading, spacing: 8) {
+                    PopoverSectionHeader(title: "Duration")
 
-                    CaffeinatePresetButton(
-                        title: "1 Hour",
-                        isActive: false,
-                        action: {
-                            Task { try? await MenuBarState.shared.powerController?.keepAwake(for: 60 * 60) }
-                        }
-                    )
-
-                    CaffeinatePresetButton(
-                        title: "Indefinitely",
-                        isActive: isIndefinite,
-                        action: {
-                            Task {
-                                if isIndefinite {
-                                    try? await MenuBarState.shared.powerController?.allowSleep()
-                                } else {
-                                    try? await MenuBarState.shared.powerController?.keepAwakeIndefinitely()
+                    HStack(spacing: 8) {
+                        ForEach(["15 min", "1 hour", "∞"], id: \.self) { preset in
+                            Button(preset) {
+                                Task {
+                                    switch preset {
+                                    case "15 min": try? await state.powerController?.keepAwake(for: 15 * 60)
+                                    case "1 hour": try? await state.powerController?.keepAwake(for: 60 * 60)
+                                    case "∞":
+                                        if isIndefinite {
+                                            try? await state.powerController?.allowSleep()
+                                        } else {
+                                            try? await state.powerController?.keepAwakeIndefinitely()
+                                        }
+                                    default: break
+                                    }
                                 }
                             }
+                            .buttonStyle(.bordered)
+                            .controlSize(.small)
+                            .tint(preset == "∞" && isIndefinite ? .green : nil)
                         }
-                    )
-
-                    if isActive {
-                        Divider()
-                            .padding(.vertical, 4)
-
-                        Button("Disable Keep Awake") {
-                            Task { try? await MenuBarState.shared.powerController?.allowSleep() }
-                        }
-                        .buttonStyle(.borderless)
-                        .foregroundStyle(.red)
-                        .font(.caption)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
                     }
                 }
+
+                if isActive && !isIndefinite {
+                    Button("Disable", role: .destructive) {
+                        Task { try? await state.powerController?.allowSleep() }
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+                }
             }
-            .padding()
-
-            Divider()
-
-            PopoverFooter()
         }
-        .frame(width: DesignSystem.Popover.Width.wide)
-        .background(.ultraThinMaterial)
     }
 }
 
