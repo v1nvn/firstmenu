@@ -2,7 +2,7 @@
 //  CaffeinateMenu.swift
 //  firstmenu
 //
-//  Created by Vineet Kumar on 06/01/26.
+//  Keep-awake menu using reusable primitives and HIG styling
 //
 
 import SwiftUI
@@ -13,22 +13,20 @@ struct CaffeinateMenuView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            // Status indicator
-            HStack {
-                Circle()
-                    .fill(powerController.isActive ? .green : .secondary)
-                    .frame(width: 8, height: 8)
+            // Status indicator using SF Symbol
+            HStack(spacing: DesignSystem.Spacing.tight) {
+                StatusDot(isActive: powerController.isActive)
                 Text(powerController.statusText)
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
-            .padding(.horizontal, 12)
-            .padding(.top, 8)
-            .padding(.bottom, 4)
+            .padding(.horizontal, DesignSystem.Spacing.section)
+            .padding(.top, DesignSystem.Spacing.standard)
+            .padding(.bottom, DesignSystem.Spacing.tight)
 
             // Presets
             VStack(spacing: 0) {
-                CaffeinateButton(
+                CaffeinateMenuButton(
                     title: "15 Minutes",
                     isActive: false,
                     action: {
@@ -36,7 +34,7 @@ struct CaffeinateMenuView: View {
                     }
                 )
 
-                CaffeinateButton(
+                CaffeinateMenuButton(
                     title: "1 Hour",
                     isActive: false,
                     action: {
@@ -44,7 +42,7 @@ struct CaffeinateMenuView: View {
                     }
                 )
 
-                CaffeinateButton(
+                CaffeinateMenuButton(
                     title: "Indefinitely",
                     isActive: powerController.isIndefinite,
                     action: {
@@ -60,27 +58,28 @@ struct CaffeinateMenuView: View {
 
                 if powerController.isActive {
                     Divider()
-                        .padding(.vertical, 4)
+                        .padding(.vertical, DesignSystem.Spacing.tight)
 
-                    Button("Disable Keep Awake") {
+                    Button("Disable Keep Awake", role: .destructive) {
                         Task { try? await powerController.allowSleep() }
                     }
                     .buttonStyle(.borderless)
-                    .foregroundStyle(.red)
                     .font(.caption)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
+                    .padding(.horizontal, DesignSystem.Spacing.section)
+                    .padding(.vertical, DesignSystem.Spacing.tight)
                 }
             }
         }
     }
 }
 
-struct CaffeinateButton: View {
+/// A button row for caffeinate presets.
+private struct CaffeinateMenuButton: View {
     let title: String
     let isActive: Bool
     let action: () -> Void
+    @State private var isHovering = false
 
     var body: some View {
         Button(action: action) {
@@ -91,13 +90,21 @@ struct CaffeinateButton: View {
                 if isActive {
                     Image(systemName: "checkmark")
                         .foregroundStyle(.green)
+                        .font(.body)
                 }
             }
         }
-        .buttonStyle(.borderless)
+        .buttonStyle(.plain)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, 12)
-        .padding(.vertical, 6)
+        .padding(.horizontal, DesignSystem.Spacing.section)
+        .padding(.vertical, DesignSystem.Spacing.tight + 2)
+        .background(isHovering ? Color.primary.opacity(0.06) : Color.clear)
+        .contentShape(Rectangle())
+        .onHover { hovering in
+            withAnimation(.easeInOut(duration: 0.15)) {
+                isHovering = hovering
+            }
+        }
     }
 }
 

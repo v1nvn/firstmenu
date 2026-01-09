@@ -2,7 +2,7 @@
 //  SettingsMenu.swift
 //  firstmenu
 //
-//  Created by Vineet Kumar on 06/01/26.
+//  Settings menu view using reusable primitives and HIG styling
 //
 
 import SwiftUI
@@ -35,22 +35,15 @@ struct SettingsMenuView: View {
         VStack(alignment: .leading, spacing: 0) {
             // Header
             Text("Settings")
-                .font(.system(size: 13, weight: .semibold))
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
+                .font(.headline)
+                .padding(.horizontal, DesignSystem.Spacing.section)
+                .padding(.vertical, DesignSystem.Spacing.standard)
 
             // Weather Section
-            VStack(spacing: 0) {
-                Text("Weather")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(.secondary)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 10)
-                    .padding(.bottom, 4)
-
+            SettingsSection(title: "Weather") {
                 HStack {
                     Text("Refresh interval")
-                        .font(.system(size: 12))
+                        .font(.body)
                     Spacer()
                     Picker("", selection: $weatherRefreshInterval) {
                         Text("5 min").tag(5.0)
@@ -59,187 +52,130 @@ struct SettingsMenuView: View {
                         Text("1 hour").tag(60.0)
                     }
                     .pickerStyle(.segmented)
-                    .frame(width: 140)
+                    .labelsHidden()
+                    .fixedSize()
                 }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
+                .padding(.horizontal, DesignSystem.Spacing.section)
+                .padding(.vertical, DesignSystem.Spacing.tight)
 
                 Text("Location detected from IP address")
-                    .font(.system(size: 10))
+                    .font(.caption)
                     .foregroundStyle(.tertiary)
-                    .padding(.horizontal, 12)
-                    .padding(.bottom, 10)
+                    .padding(.horizontal, DesignSystem.Spacing.section)
+                    .padding(.bottom, DesignSystem.Spacing.standard)
             }
-            .background(Color.black.opacity(0.03))
 
             // Menu Bar Items Visibility Section
-            VStack(spacing: 0) {
-                Text("Menu Bar Items")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(.secondary)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 10)
-                    .padding(.bottom, 4)
+            SettingsSection(title: "Menu Bar Items") {
+                ToggleRow("CPU Usage", systemImage: "cpu", isOn: $showCPUInMenuBar)
+                    .padding(.horizontal, DesignSystem.Spacing.section)
+                    .padding(.vertical, DesignSystem.Spacing.tight)
 
-                SettingToggle(
-                    title: "CPU Usage",
-                    icon: "cpu",
-                    isOn: $showCPUInMenuBar
-                )
+                ToggleRow("Memory", systemImage: "memorychip", isOn: $showRAMInMenuBar)
+                    .padding(.horizontal, DesignSystem.Spacing.section)
+                    .padding(.vertical, DesignSystem.Spacing.tight)
 
-                SettingToggle(
-                    title: "Memory",
-                    icon: "memorychip",
-                    isOn: $showRAMInMenuBar
-                )
+                ToggleRow("Storage", systemImage: "internaldrive", isOn: $showStorageInMenuBar)
+                    .padding(.horizontal, DesignSystem.Spacing.section)
+                    .padding(.vertical, DesignSystem.Spacing.tight)
 
-                SettingToggle(
-                    title: "Storage",
-                    icon: "internaldrive",
-                    isOn: $showStorageInMenuBar
-                )
+                ToggleRow("Weather", systemImage: "cloud.sun", isOn: $showWeatherInMenuBar)
+                    .padding(.horizontal, DesignSystem.Spacing.section)
+                    .padding(.vertical, DesignSystem.Spacing.tight)
 
-                SettingToggle(
-                    title: "Weather",
-                    icon: "cloud.sun",
-                    isOn: $showWeatherInMenuBar
-                )
-
-                SettingToggle(
-                    title: "Network",
-                    icon: "network",
-                    isOn: $showNetworkInMenuBar
-                )
-                .padding(.bottom, 6)
+                ToggleRow("Network", systemImage: "network", isOn: $showNetworkInMenuBar)
+                    .padding(.horizontal, DesignSystem.Spacing.section)
+                    .padding(.vertical, DesignSystem.Spacing.tight)
+                    .padding(.bottom, DesignSystem.Spacing.tight)
             }
-            .background(Color.black.opacity(0.03))
 
             // Display Mode Section
-            VStack(spacing: 0) {
-                Text("Display Mode")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(.secondary)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 10)
-                    .padding(.bottom, 4)
-
-                DisplayModePicker(
-                    title: "CPU",
-                    icon: "cpu",
-                    selection: $cpuDisplayMode
-                )
-
-                DisplayModePicker(
-                    title: "Memory",
-                    icon: "memorychip",
-                    selection: $ramDisplayMode
-                )
-
-                DisplayModePicker(
-                    title: "Storage",
-                    icon: "internaldrive",
-                    selection: $storageDisplayMode
-                )
-
-                DisplayModePicker(
-                    title: "Weather",
-                    icon: "cloud.sun",
-                    selection: $weatherDisplayMode
-                )
-
-                DisplayModePicker(
-                    title: "Network",
-                    icon: "network",
-                    selection: $networkDisplayMode
-                )
-                .padding(.bottom, 6)
+            SettingsSection(title: "Display Mode") {
+                DisplayModeRow(title: "CPU", systemImage: "cpu", selection: $cpuDisplayMode)
+                DisplayModeRow(title: "Memory", systemImage: "memorychip", selection: $ramDisplayMode)
+                DisplayModeRow(title: "Storage", systemImage: "internaldrive", selection: $storageDisplayMode)
+                DisplayModeRow(title: "Weather", systemImage: "cloud.sun", selection: $weatherDisplayMode)
+                DisplayModeRow(title: "Network", systemImage: "network", selection: $networkDisplayMode)
+                    .padding(.bottom, DesignSystem.Spacing.tight)
             }
-            .background(Color.black.opacity(0.03))
 
             // About Section
-            VStack(spacing: 0) {
-                Text("About")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(.secondary)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 10)
-                    .padding(.bottom, 4)
-
-                VStack(alignment: .leading, spacing: 4) {
+            SettingsSection(title: "About") {
+                VStack(alignment: .leading, spacing: DesignSystem.Spacing.tight) {
                     HStack {
                         Text("firstmenu")
-                            .font(.system(size: 12, weight: .semibold))
+                            .font(.body.weight(.medium))
                         Spacer()
                         Text("v\(version) (\(build))")
-                            .font(.system(size: 11))
+                            .font(.subheadline)
                             .foregroundStyle(.secondary)
                     }
                     Text("A minimal macOS menu bar system companion")
-                        .font(.system(size: 10))
+                        .font(.caption)
                         .foregroundStyle(.tertiary)
                 }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
+                .padding(.horizontal, DesignSystem.Spacing.section)
+                .padding(.vertical, DesignSystem.Spacing.tight)
             }
-            .background(Color.black.opacity(0.03))
 
             // Footer
             HStack {
                 Text("Made with SwiftUI")
-                    .font(.system(size: 10))
+                    .font(.caption)
                     .foregroundStyle(.tertiary)
                 Spacer()
                 Button("Quit") {
                     NSApplication.shared.terminate(nil)
                 }
                 .buttonStyle(.borderless)
-                .font(.system(size: 11))
+                .font(.subheadline)
                 .foregroundStyle(.secondary)
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
+            .padding(.horizontal, DesignSystem.Spacing.section)
+            .padding(.vertical, DesignSystem.Spacing.standard)
         }
         .frame(width: 280)
         .background(.ultraThinMaterial)
     }
 }
 
-struct SettingToggle: View {
+// MARK: - Settings Section
+
+/// A section container for settings with a header.
+private struct SettingsSection<Content: View>: View {
     let title: String
-    let icon: String
-    @Binding var isOn: Bool
+    @ViewBuilder let content: () -> Content
 
     var body: some View {
-        HStack {
-            Image(systemName: icon)
-                .font(.system(size: 11))
-                .foregroundStyle(.secondary)
-                .frame(width: 16)
+        VStack(alignment: .leading, spacing: 0) {
             Text(title)
-                .font(.system(size: 12))
-            Spacer()
-            Toggle("", isOn: $isOn)
-                .toggleStyle(.switch)
-                .controlSize(.small)
+                .sectionHeaderStyle()
+                .padding(.horizontal, DesignSystem.Spacing.section)
+                .padding(.vertical, DesignSystem.Spacing.standard)
+                .padding(.bottom, DesignSystem.Spacing.tight)
+
+            content()
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 5)
+        .background(.fill.quaternary)
     }
 }
 
-struct DisplayModePicker: View {
+// MARK: - Display Mode Row
+
+/// A row with a segmented picker for display mode selection.
+private struct DisplayModeRow: View {
     let title: String
-    let icon: String
+    let systemImage: String
     @Binding var selection: String
 
     var body: some View {
-        HStack {
-            Image(systemName: icon)
-                .font(.system(size: 11))
+        HStack(spacing: DesignSystem.Spacing.standard) {
+            Image(systemName: systemImage)
+                .font(.body)
                 .foregroundStyle(.secondary)
-                .frame(width: 16)
+                .frame(width: 20)
             Text(title)
-                .font(.system(size: 12))
+                .font(.body)
             Spacer()
             Picker("", selection: $selection) {
                 Text("Icon").tag(MenuBarDisplayMode.icon.rawValue)
@@ -247,10 +183,11 @@ struct DisplayModePicker: View {
                 Text("Both").tag(MenuBarDisplayMode.both.rawValue)
             }
             .pickerStyle(.segmented)
-            .frame(width: 110)
+            .labelsHidden()
+            .fixedSize()
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 5)
+        .padding(.horizontal, DesignSystem.Spacing.section)
+        .padding(.vertical, DesignSystem.Spacing.tight)
     }
 }
 

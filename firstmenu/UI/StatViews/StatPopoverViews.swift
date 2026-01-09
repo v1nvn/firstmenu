@@ -17,7 +17,7 @@ struct CPUPopoverView: View {
     }
 
     var body: some View {
-        PopoverContainer(width: 200) {
+        PopoverContainer(width: DesignSystem.Popover.compactWidth) {
             PopoverSection {
                 PopoverHeader("CPU", systemImage: "cpu", value: "\(Int(state.cpuPercentage))%", valueColor: progressColor)
                     .accessibilityLabel("CPU usage: \(Int(state.cpuPercentage)) percent")
@@ -226,12 +226,7 @@ struct AppsPopoverView: View {
                     .font(.headline)
                 Spacer()
                 if !appManager.isLoading && !appManager.runningApps.isEmpty {
-                    Text("\(appManager.appCount)")
-                        .font(.subheadline.monospacedDigit())
-                        .foregroundStyle(.secondary)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 2)
-                        .background(.quaternary, in: Capsule())
+                    CountBadge(count: appManager.appCount)
                 }
             }
             .padding()
@@ -258,12 +253,11 @@ struct AppsPopoverView: View {
                 Button("Quit All Apps", role: .destructive) {
                     showingQuitAllAlert = true
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.borderless)
                 .font(.subheadline)
-                .foregroundStyle(.red)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal)
-                .padding(.vertical, 8)
+                .padding(.vertical, DesignSystem.Spacing.standard)
                 .confirmationDialog(
                     "Quit all running applications?",
                     isPresented: $showingQuitAllAlert,
@@ -281,16 +275,15 @@ struct AppsPopoverView: View {
             Divider()
 
             // Keep Awake section
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: DesignSystem.Spacing.standard) {
                 HStack {
                     Label("Keep Awake", systemImage: powerController.isActive ? "moon.fill" : "moon.zzz")
-                        .font(.subheadline.weight(.medium))
-                        .foregroundStyle(.secondary)
+                        .sectionHeaderStyle()
                     Spacer()
                     StatusIndicator(isActive: powerController.isActive)
                 }
 
-                HStack(spacing: 8) {
+                HStack(spacing: DesignSystem.Spacing.standard) {
                     ForEach(["15m", "1h", "∞"], id: \.self) { preset in
                         Button(preset) {
                             Task {
@@ -313,23 +306,22 @@ struct AppsPopoverView: View {
                     }
 
                     if powerController.isActive && !powerController.isIndefinite {
-                        Button("Off") {
+                        Button("Off", role: .destructive) {
                             Task { try? await powerController.allowSleep() }
                         }
                         .buttonStyle(.bordered)
                         .controlSize(.small)
-                        .tint(.red)
                     }
                 }
             }
             .padding()
-            .background(.quinary)
+            .background(.fill.quinary)
 
             Divider()
 
             PopoverFooter()
         }
-        .frame(width: 260)
+        .frame(width: DesignSystem.Popover.wideWidth)
         .background(.regularMaterial)
         .onAppear {
             Task { await appManager.refresh() }
@@ -345,29 +337,27 @@ struct AppsListRowView: View {
     @State private var isHovering = false
 
     var body: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: DesignSystem.Spacing.standard) {
             Image(systemName: "app.fill")
-                .font(.subheadline)
+                .font(.body)
                 .foregroundStyle(.secondary)
             Text(app.name)
-                .font(.subheadline)
+                .font(.body)
                 .lineLimit(1)
             Spacer()
-            Button(action: onQuit) {
-                Image(systemName: "xmark.circle.fill")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+            IconButton("xmark.circle.fill", help: "Quit \(app.name)") {
+                onQuit()
             }
-            .buttonStyle(.plain)
-            .opacity(isHovering ? 1 : 0.5)
-            .help("Quit \(app.name)")
+            .opacity(isHovering ? 1 : 0.3)
         }
-        .padding(.horizontal)
-        .padding(.vertical, 6)
-        .background(isHovering ? Color.primary.opacity(0.05) : Color.clear)
+        .padding(.horizontal, DesignSystem.Spacing.section)
+        .padding(.vertical, DesignSystem.Spacing.tight + 2)
+        .background(isHovering ? Color.primary.opacity(0.06) : Color.clear)
         .contentShape(Rectangle())
         .onHover { hovering in
-            isHovering = hovering
+            withAnimation(.easeInOut(duration: 0.15)) {
+                isHovering = hovering
+            }
         }
         .contextMenu {
             Button("Quit", role: .destructive) {

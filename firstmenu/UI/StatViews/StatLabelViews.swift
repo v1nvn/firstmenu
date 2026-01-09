@@ -45,7 +45,7 @@ struct CPUStatLabelView: View {
             Text("\(safePercentage)%")
                 .menuBarMonospaced()
         case .both:
-            HStack(spacing: DesignSystem.Spacing.tight) {
+            HStack(spacing: DesignSystem.Spacing.extraTight) {
                 Image(systemName: "cpu")
                     .font(.system(size: DesignSystem.MenuBar.iconSize))
                 Text("\(safePercentage)%")
@@ -81,7 +81,7 @@ struct RAMStatLabelView: View {
             Text("\(usedGB)G")
                 .menuBarMonospaced()
         case .both:
-            HStack(spacing: DesignSystem.Spacing.tight) {
+            HStack(spacing: DesignSystem.Spacing.extraTight) {
                 Image(systemName: "memorychip")
                     .font(.system(size: DesignSystem.MenuBar.iconSize))
                 Text("\(usedGB)G")
@@ -113,7 +113,7 @@ struct SSDStatLabelView: View {
             Text("\(percentage)%")
                 .menuBarMonospaced()
         case .both:
-            HStack(spacing: DesignSystem.Spacing.tight) {
+            HStack(spacing: DesignSystem.Spacing.extraTight) {
                 Image(systemName: "internaldrive")
                     .font(.system(size: DesignSystem.MenuBar.iconSize))
                 Text("\(percentage)%")
@@ -145,7 +145,7 @@ struct WeatherStatLabelView: View {
             Text("\(safeTemperature)°")
                 .menuBarMonospaced()
         case .both:
-            HStack(spacing: DesignSystem.Spacing.tight) {
+            HStack(spacing: DesignSystem.Spacing.extraTight) {
                 Image(systemName: sfSymbolName)
                     .font(.system(size: DesignSystem.MenuBar.iconSize))
                 Text("\(safeTemperature)°")
@@ -184,27 +184,33 @@ struct NetworkStatLabelView: View {
                 .font(.system(size: DesignSystem.MenuBar.iconSize))
                 .foregroundStyle(isActive ? .primary : .secondary)
         case .value:
-            Group {
-                if isActive {
-                    Text("↓\(formatSpeed(downloadBPS)) ↑\(formatSpeed(uploadBPS))")
-                } else {
-                    Text("— —")
-                }
-            }
-            .menuBarMonospaced()
-            .foregroundStyle(isActive ? .primary : .secondary)
+            networkSpeedView
+                .menuBarMonospaced()
+                .foregroundStyle(isActive ? .primary : .secondary)
         case .both:
-            HStack(spacing: DesignSystem.Spacing.tight) {
+            HStack(spacing: DesignSystem.Spacing.extraTight) {
                 Image(systemName: isActive ? "antenna.radiowaves.left.and.right" : "network.slash")
                     .font(.system(size: DesignSystem.MenuBar.iconSize))
-                if isActive {
-                    Text("↓\(formatSpeed(downloadBPS)) ↑\(formatSpeed(uploadBPS))")
-                } else {
-                    Text("— —")
-                }
+                networkSpeedView
             }
             .menuBarMonospaced()
             .foregroundStyle(isActive ? .primary : .secondary)
+        }
+    }
+
+    @ViewBuilder
+    private var networkSpeedView: some View {
+        if isActive {
+            HStack(spacing: 2) {
+                Image(systemName: "arrow.down")
+                    .font(.system(size: 9, weight: .medium))
+                Text(formatSpeed(downloadBPS))
+                Image(systemName: "arrow.up")
+                    .font(.system(size: 9, weight: .medium))
+                Text(formatSpeed(uploadBPS))
+            }
+        } else {
+            Text("- -")
         }
     }
 }

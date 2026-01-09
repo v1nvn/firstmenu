@@ -20,7 +20,7 @@ struct PopoverFooter: View {
             SettingsLink {
                 Label("Settings", systemImage: "gearshape")
             }
-            .footerButtonStyle()
+            .accessoryButtonStyle()
             .accessibilityLabel("Open Settings")
             .accessibilityHint("Opens the settings panel")
 
@@ -31,13 +31,13 @@ struct PopoverFooter: View {
             } label: {
                 Label("Quit", systemImage: "power")
             }
-            .footerButtonStyle()
+            .accessoryButtonStyle()
             .accessibilityLabel("Quit firstmenu")
             .accessibilityHint("Quits the application")
         }
         .padding(.horizontal)
-        .padding(.vertical, 10)
-        .background(.quinary)
+        .padding(.vertical, DesignSystem.Spacing.standard + 2)
+        .background(.fill.quinary)
         .accessibilityElement(children: .contain)
         .accessibilityLabel("Menu options")
     }

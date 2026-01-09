@@ -15,7 +15,7 @@ struct PopoverContainer<Content: View>: View {
     let width: CGFloat
     @ViewBuilder let content: () -> Content
 
-    init(width: CGFloat = 220, @ViewBuilder content: @escaping () -> Content) {
+    init(width: CGFloat = DesignSystem.Popover.standardWidth, @ViewBuilder content: @escaping () -> Content) {
         self.width = width
         self.content = content
     }
@@ -59,7 +59,7 @@ struct PopoverHeader: View {
             Spacer()
             if let value = value {
                 Text(value)
-                    .font(.system(.body, design: .monospaced))
+                    .statsStyle()
                     .foregroundStyle(valueColor ?? .primary)
             }
         }
@@ -111,22 +111,28 @@ struct PopoverSectionHeader: View {
 
     var body: some View {
         Text(title)
-            .font(.subheadline.weight(.medium))
-            .foregroundStyle(.secondary)
+            .sectionHeaderStyle()
     }
 }
 
 // MARK: - Status Indicator
 
-/// A small colored circle indicating status.
+/// A status indicator using SF Symbols following macOS HIG.
 struct StatusIndicator: View {
     let isActive: Bool
+    let activeColor: Color
+
+    init(isActive: Bool, activeColor: Color = .green) {
+        self.isActive = isActive
+        self.activeColor = activeColor
+    }
 
     var body: some View {
         if isActive {
             Image(systemName: "checkmark.circle.fill")
-                .foregroundStyle(.green)
+                .foregroundStyle(activeColor)
                 .font(.subheadline)
+                .accessibilityLabel("Active")
         }
     }
 }
@@ -140,7 +146,7 @@ struct PresetButtonGroup: View {
     let action: (String) -> Void
 
     var body: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: DesignSystem.Spacing.standard) {
             ForEach(presets, id: \.self) { preset in
                 Button(preset) {
                     action(preset)
@@ -160,7 +166,7 @@ struct PopoverSection<Content: View>: View {
     let spacing: CGFloat
     @ViewBuilder let content: () -> Content
 
-    init(spacing: CGFloat = 8, @ViewBuilder content: @escaping () -> Content) {
+    init(spacing: CGFloat = DesignSystem.Spacing.standard, @ViewBuilder content: @escaping () -> Content) {
         self.spacing = spacing
         self.content = content
     }
