@@ -74,12 +74,6 @@ final class MachCPUReaderTests: XCTestCase {
 
         XCTAssertTrue(r1 >= 0.0 && r1 <= 100.0)
         XCTAssertTrue(r2 >= 0.0 && r2 <= 100.0)
-        assertTrue(r3 >= 0.0 && r3 <= 100.0)
-    }
-
-    // MARK: - Helper
-
-    func assertTrue(_ condition: Bool, _ message: String = "") {
-        XCTAssertTrue(condition, message)
+        XCTAssertTrue(r3 >= 0.0 && r3 <= 100.0)
     }
 }

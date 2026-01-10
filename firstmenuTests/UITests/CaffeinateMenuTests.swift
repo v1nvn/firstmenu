@@ -28,34 +28,21 @@ final class CaffeinateMenuTests: XCTestCase {
 
     // MARK: - PowerAssertionController Tests
 
-    // NOTE: These tests are temporarily disabled due to issues with @Observable in test environment.
-    // The controller works correctly in the actual app, but crashes in unit tests.
-    // This appears to be a known issue with @Observable and unit test runners.
-
-    func testPowerAssertionControllerCreation() throws {
-        // Temporarily skip - @Observable macro causes crashes in test environment
-        throw XCTSkip("Skipping due to @Observable test environment issue")
-
+    func testPowerAssertionControllerCreation() async {
         let provider = MockPowerProvider()
         let controller = PowerAssertionController(powerProvider: provider)
         XCTAssertNotNil(controller)
         XCTAssertEqual(controller.state, .inactive)
     }
 
-    func testPowerAssertionControllerStateAccess() throws {
-        // Temporarily skip - @Observable macro causes crashes in test environment
-        throw XCTSkip("Skipping due to @Observable test environment issue")
-
+    func testPowerAssertionControllerStateAccess() async {
         let provider = MockPowerProvider()
         let controller = PowerAssertionController(powerProvider: provider)
         let state = controller.state
         XCTAssertTrue(state == .inactive || state != .inactive, "State should be readable")
     }
 
-    func testPowerAssertionControllerInitOnly() throws {
-        // Temporarily skip - @Observable macro causes crashes in test environment
-        throw XCTSkip("Skipping due to @Observable test environment issue")
-
+    func testPowerAssertionControllerInitOnly() async {
         let provider = MockPowerProvider()
         let controller = PowerAssertionController(powerProvider: provider)
         XCTAssertNotNil(controller)
@@ -63,94 +50,95 @@ final class CaffeinateMenuTests: XCTestCase {
 
     // MARK: - StatusText Tests
 
-    func testStatusTextForInactiveState() throws {
-        throw XCTSkip("Skipping due to @Observable test environment issue")
+    func testStatusTextForInactiveState() async {
+        let provider = MockPowerProvider()
+        let controller = PowerAssertionController(powerProvider: provider)
+        XCTAssertEqual(controller.state, .inactive)
+        XCTAssertFalse(controller.isActive)
     }
 
     // MARK: - CaffeinateMenuView Tests
 
-    func testCaffeinateMenuViewRenders() throws {
-        throw XCTSkip("Skipping due to @Observable test environment issue")
+    func testCaffeinateMenuViewRenders() async {
+        let provider = MockPowerProvider()
+        let controller = PowerAssertionController(powerProvider: provider)
+        let view = CaffeinateMenuView(powerController: controller)
+        XCTAssertNotNil(view)
     }
 
-    func testCaffeinateMenuViewWithInactiveState() throws {
-        throw XCTSkip("Skipping due to @Observable test environment issue")
+    func testCaffeinateMenuViewWithInactiveState() async {
+        let provider = MockPowerProvider()
+        let controller = PowerAssertionController(powerProvider: provider)
+        let view = CaffeinateMenuView(powerController: controller)
+        XCTAssertNotNil(view.body, "View body should render with inactive state")
     }
 
-    func testCaffeinateMenuViewWithActiveState() async throws {
-        throw XCTSkip("Skipping due to @Observable test environment issue")
+    func testCaffeinateMenuViewWithActiveState() async {
+        let provider = MockPowerProvider()
+        try? await provider.activate(duration: 3600)
+        let controller = PowerAssertionController(powerProvider: provider)
+        let view = CaffeinateMenuView(powerController: controller)
+        XCTAssertNotNil(view.body, "View body should render with active state")
     }
 
-    func testCaffeinateMenuViewWithTimedState() async throws {
-        throw XCTSkip("Skipping due to @Observable test environment issue")
+    func testCaffeinateMenuViewWithTimedState() async {
+        let provider = MockPowerProvider()
+        try? await provider.activate(duration: 300)  // 5 minutes
+        let controller = PowerAssertionController(powerProvider: provider)
+        let view = CaffeinateMenuView(powerController: controller)
+        XCTAssertNotNil(view.body, "View body should render with timed state")
     }
 
-    func testCaffeinateMenuViewWithAllButtons() throws {
-        throw XCTSkip("Skipping due to @Observable test environment issue")
-    }
-
-    // MARK: - CaffeinateButton Tests
-
-    func testCaffeinateButtonRenders() {
-        let button = CaffeinateButton(
-            title: "15 Minutes",
-            isActive: false,
-            action: {}
-        )
-        XCTAssertNotNil(button)
-    }
-
-    func testCaffeinateButtonInactive() {
-        let button = CaffeinateButton(
-            title: "1 Hour",
-            isActive: false,
-            action: {}
-        )
-        _ = button.body
-    }
-
-    func testCaffeinateButtonActive() {
-        let button = CaffeinateButton(
-            title: "Indefinitely",
-            isActive: true,
-            action: {}
-        )
-        _ = button.body
-    }
-
-    func testCaffeinateButtonActionExecutes() {
-        var actionExecuted = false
-        let button = CaffeinateButton(
-            title: "Test",
-            isActive: false,
-            action: { actionExecuted = true }
-        )
-        _ = button.body
-        XCTAssertNotNil(button)
+    func testCaffeinateMenuViewWithAllButtons() async {
+        let provider = MockPowerProvider()
+        let controller = PowerAssertionController(powerProvider: provider)
+        let view = CaffeinateMenuView(powerController: controller)
+        XCTAssertNotNil(view.body, "View should render all buttons")
     }
 
     // MARK: - PowerAssertionController StatusText Tests
 
-    func testStatusTextForIndefiniteState() async throws {
-        throw XCTSkip("Skipping due to @Observable test environment issue")
+    func testStatusTextForIndefiniteState() async {
+        let provider = MockPowerProvider()
+        try? await provider.activate(duration: nil)
+        let controller = PowerAssertionController(powerProvider: provider)
+        XCTAssertTrue(controller.isIndefinite)
+        XCTAssertTrue(controller.isActive)
     }
 
-    func testStatusTextForActiveStateWithRemainingTime() async throws {
-        throw XCTSkip("Skipping due to @Observable test environment issue")
+    func testStatusTextForActiveStateWithRemainingTime() async {
+        let provider = MockPowerProvider()
+        try? await provider.activate(duration: 3600)  // 1 hour
+        let controller = PowerAssertionController(powerProvider: provider)
+        XCTAssertTrue(controller.isActive)
+        XCTAssertFalse(controller.isIndefinite)
     }
 
-    func testStatusTextForActiveStateAlmostExpired() async throws {
-        throw XCTSkip("Skipping due to @Observable test environment issue")
+    func testStatusTextForActiveStateAlmostExpired() async {
+        let provider = MockPowerProvider()
+        try? await provider.activate(duration: 60)  // 1 minute
+        let controller = PowerAssertionController(powerProvider: provider)
+        XCTAssertTrue(controller.isActive)
     }
 
-    func testStatusTextForActiveStateExpired() async throws {
-        throw XCTSkip("Skipping due to @Observable test environment issue")
+    func testStatusTextForActiveStateExpired() async {
+        let provider = MockPowerProvider()
+        // Activate with negative duration to simulate expired state
+        try? await provider.activate(duration: -1)
+        let controller = PowerAssertionController(powerProvider: provider)
+        // State is technically active but with expired time
+        XCTAssertTrue(controller.isActive)
     }
 
     // MARK: - Integration Tests
 
-    func testCaffeinateMenuViewShowsDisableButtonWhenActive() async throws {
-        throw XCTSkip("Skipping due to @Observable test environment issue")
+    func testCaffeinateMenuViewShowsDisableButtonWhenActive() async {
+        let provider = MockPowerProvider()
+        try? await provider.activate(duration: 3600)
+        let controller = PowerAssertionController(powerProvider: provider)
+        let view = CaffeinateMenuView(powerController: controller)
+        XCTAssertTrue(controller.isActive)
+        XCTAssertNotNil(view.body, "View should render with disable button")
     }
 
 }

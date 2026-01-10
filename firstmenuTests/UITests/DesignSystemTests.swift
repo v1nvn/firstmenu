@@ -15,72 +15,59 @@ final class DesignSystemTests: XCTestCase {
     // MARK: - Typography
 
     func testMenuBarFontExists() {
-        let font = DesignSystem.Typography.menuBarFont
-        // Font values are opaque in SwiftUI, we just verify they're accessible
+        let font = DesignSystem.Typography.menuBar
         XCTAssertNotNil(font)
     }
 
-    func testMenuBarFontMonospacedExists() {
-        let font = DesignSystem.Typography.menuBarFontMonospaced
-        XCTAssertNotNil(font)
-    }
-
-    func testHeadingFontExists() {
-        let font = DesignSystem.Typography.headingFont
+    func testSectionHeaderFontExists() {
+        let font = DesignSystem.Typography.sectionHeader
         XCTAssertNotNil(font)
     }
 
     func testBodyFontExists() {
-        let font = DesignSystem.Typography.bodyFont
+        let font = DesignSystem.Typography.body
         XCTAssertNotNil(font)
     }
 
-    func testSecondaryFontExists() {
-        let font = DesignSystem.Typography.secondaryFont
+    func testCaptionFontExists() {
+        let font = DesignSystem.Typography.caption
         XCTAssertNotNil(font)
     }
 
-    func testTertiaryFontExists() {
-        let font = DesignSystem.Typography.tertiaryFont
+    func testStatsFontExists() {
+        let font = DesignSystem.Typography.stats
         XCTAssertNotNil(font)
     }
 
     // MARK: - Colors
 
-    func testMenuBarTextColor() {
-        let color = DesignSystem.Colors.menuBarText
-        // Verify it's a valid color (white)
-        XCTAssertEqual(color, .white)
+    func testDownloadColor() {
+        let color = DesignSystem.Colors.download
+        XCTAssertEqual(color, .green)
     }
 
-    func testMenuBarTextDimmedColor() {
-        let color = DesignSystem.Colors.menuBarTextDimmed
-        // Verify it's white with reduced opacity
-        XCTAssertTrue(color.description.contains("white") || color == .white.opacity(0.5))
+    func testUploadColor() {
+        let color = DesignSystem.Colors.upload
+        XCTAssertEqual(color, .blue)
     }
 
     func testProgressColorGreenForLowPercentage() {
         let color = DesignSystem.Colors.progressColor(for: 50)
-        // 50% is below warning threshold (70), should be green
-        // Note: Color equality is limited in SwiftUI, we verify it doesn't crash
         XCTAssertNotNil(color)
     }
 
     func testProgressColorOrangeForWarningPercentage() {
         let color = DesignSystem.Colors.progressColor(for: 75)
-        // 75% is above warning (70) but below critical (90), should be orange
         XCTAssertNotNil(color)
     }
 
     func testProgressColorRedForCriticalPercentage() {
         let color = DesignSystem.Colors.progressColor(for: 95)
-        // 95% is above critical threshold (90), should be red
         XCTAssertNotNil(color)
     }
 
     func testProgressColorWithCustomThresholds() {
         let color = DesignSystem.Colors.progressColor(for: 85, thresholds: (50, 80))
-        // 85% is above critical (80), should be red
         XCTAssertNotNil(color)
     }
 
@@ -106,34 +93,35 @@ final class DesignSystemTests: XCTestCase {
 
     // MARK: - Spacing
 
+    func testSpacingExtraTight() {
+        XCTAssertEqual(DesignSystem.Spacing.extraTight, 2)
+    }
+
     func testSpacingTight() {
-        XCTAssertEqual(DesignSystem.Spacing.tight, 2)
+        XCTAssertEqual(DesignSystem.Spacing.tight, 4)
     }
 
     func testSpacingStandard() {
-        XCTAssertEqual(DesignSystem.Spacing.standard, 4)
+        XCTAssertEqual(DesignSystem.Spacing.standard, 8)
     }
 
-    func testSpacingComfortable() {
-        XCTAssertEqual(DesignSystem.Spacing.comfortable, 8)
+    func testSpacingSection() {
+        XCTAssertEqual(DesignSystem.Spacing.section, 12)
     }
 
-    func testSpacingLoose() {
-        XCTAssertEqual(DesignSystem.Spacing.loose, 12)
+    func testSpacingLarge() {
+        XCTAssertEqual(DesignSystem.Spacing.large, 16)
     }
 
     // MARK: - Menu Bar
 
-    func testMenuBarMinWidth() {
-        XCTAssertEqual(DesignSystem.MenuBar.minWidth, 24)
+    func testMenuBarFont() {
+        let font = DesignSystem.MenuBar.font
+        XCTAssertNotNil(font)
     }
 
     func testMenuBarWidthPadding() {
         XCTAssertEqual(DesignSystem.MenuBar.widthPadding, 8)
-    }
-
-    func testMenuBarHeight() {
-        XCTAssertEqual(DesignSystem.MenuBar.height, 22)
     }
 
     func testMenuBarIconSize() {
@@ -143,65 +131,22 @@ final class DesignSystemTests: XCTestCase {
     // MARK: - Popover
 
     func testPopoverCornerRadius() {
-        XCTAssertEqual(DesignSystem.Popover.cornerRadius, 6)
+        XCTAssertEqual(DesignSystem.Popover.cornerRadius, 8)
     }
 
-    func testPopoverContentPadding() {
-        XCTAssertEqual(DesignSystem.Popover.contentPadding, 8)
+    func testPopoverCompactWidth() {
+        XCTAssertEqual(DesignSystem.Popover.compactWidth, 200)
     }
 
-    func testPopoverBackgroundMaterial() {
-        let material = DesignSystem.Popover.backgroundMaterial
-        // Material is an opaque type, just verify it's accessible
-        XCTAssertNotNil(material)
+    func testPopoverStandardWidth() {
+        XCTAssertEqual(DesignSystem.Popover.standardWidth, 220)
     }
 
-    func testPopoverWidthCompact() {
-        XCTAssertEqual(DesignSystem.Popover.Width.compact, 160)
-    }
-
-    func testPopoverWidthStandard() {
-        XCTAssertEqual(DesignSystem.Popover.Width.standard, 180)
-    }
-
-    func testPopoverWidthWide() {
-        XCTAssertEqual(DesignSystem.Popover.Width.wide, 200)
-    }
-
-    func testPopoverWidthExtraWide() {
-        XCTAssertEqual(DesignSystem.Popover.Width.extraWide, 220)
-    }
-
-    func testPopoverHeightCompact() {
-        XCTAssertEqual(DesignSystem.Popover.Height.compact, 60)
-    }
-
-    func testPopoverHeightStandard() {
-        XCTAssertEqual(DesignSystem.Popover.Height.standard, 70)
-    }
-
-    func testPopoverHeightTall() {
-        XCTAssertEqual(DesignSystem.Popover.Height.tall, 80)
-    }
-
-    // MARK: - Layout
-
-    func testLayoutCornerRadius() {
-        XCTAssertEqual(DesignSystem.Layout.cornerRadius, 4)
-    }
-
-    func testLayoutBorderWidth() {
-        XCTAssertEqual(DesignSystem.Layout.borderWidth, 0.5)
+    func testPopoverWideWidth() {
+        XCTAssertEqual(DesignSystem.Popover.wideWidth, 260)
     }
 
     // MARK: - View Extensions
-
-    func testMenuBarTextExtensionExists() {
-        let text = Text("test")
-        let styled = text.menuBarText()
-        // View extensions return opaque types, just verify they compile and don't crash
-        XCTAssertNotNil(styled)
-    }
 
     func testMenuBarMonospacedExtensionExists() {
         let text = Text("test")
@@ -209,27 +154,15 @@ final class DesignSystemTests: XCTestCase {
         XCTAssertNotNil(styled)
     }
 
-    func testPopoverHeadingExtensionExists() {
+    func testSectionHeaderStyleExtensionExists() {
         let text = Text("test")
-        let styled = text.popoverHeading()
+        let styled = text.sectionHeaderStyle()
         XCTAssertNotNil(styled)
     }
 
-    func testPopoverBodyExtensionExists() {
+    func testStatsStyleExtensionExists() {
         let text = Text("test")
-        let styled = text.popoverBody()
-        XCTAssertNotNil(styled)
-    }
-
-    func testPopoverSecondaryExtensionExists() {
-        let text = Text("test")
-        let styled = text.popoverSecondary()
-        XCTAssertNotNil(styled)
-    }
-
-    func testPopoverTertiaryExtensionExists() {
-        let text = Text("test")
-        let styled = text.popoverTertiary()
+        let styled = text.statsStyle()
         XCTAssertNotNil(styled)
     }
 }

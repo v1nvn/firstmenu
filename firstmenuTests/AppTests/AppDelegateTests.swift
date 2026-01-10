@@ -72,7 +72,7 @@ final class AppDelegateTests: XCTestCase {
         XCTAssertNotNil(state)
     }
 
-    func testSetPowerControllerDoesNotCrash() {
+    func testSetPowerControllerDoesNotCrash() async {
         let state = MenuBarState.shared
         let provider = MockPowerProvider()
         let controller = PowerAssertionController(powerProvider: provider)

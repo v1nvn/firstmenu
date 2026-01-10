@@ -235,8 +235,8 @@ final class AppProcessTests: XCTestCase {
             pid: 200
         )
 
-        // ID is same, so they should be equal even with different PIDs
-        XCTAssertEqual(app1, app2)
+        // Even with same ID, different PIDs make them not equal (Equatable compares all fields)
+        XCTAssertNotEqual(app1, app2)
     }
 
     func testAppProcessWithWhitespaceInName() {

@@ -214,9 +214,17 @@ struct NetworkPopoverView: View {
 // MARK: - Apps Popover
 
 struct AppsPopoverView: View {
-    @State private var appManager = AppProcessManager(appLister: NSWorkspaceAppLister())
-    @State private var powerController = PowerAssertionController(powerProvider: CaffeinateWrapper())
+    @State private var appManager: AppProcessManager
+    @State private var powerController: PowerAssertionController
     @State private var showingQuitAllAlert = false
+
+    init(
+        appManager: AppProcessManager? = nil,
+        powerController: PowerAssertionController? = nil
+    ) {
+        _appManager = State(initialValue: appManager ?? AppProcessManager(appLister: NSWorkspaceAppLister()))
+        _powerController = State(initialValue: powerController ?? PowerAssertionController(powerProvider: CaffeinateWrapper()))
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {

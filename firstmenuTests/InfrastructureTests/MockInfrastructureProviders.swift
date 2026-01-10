@@ -142,9 +142,14 @@ actor MockAppLister: AppListing {
         if _shouldThrow {
             throw AppError.terminateFailed
         }
+        // Check if app exists (comparing nil-coalesced to empty string for nil bundle IDs)
+        let appExists = _apps.contains(where: { ($0.bundleIdentifier ?? "") == bundleIdentifier })
+        guard appExists else {
+            throw AppError.notFound
+        }
         _quitCallCount.append(bundleIdentifier)
         // Actually remove the app from the list (simulating real behavior)
-        _apps.removeAll { $0.bundleIdentifier == bundleIdentifier }
+        _apps.removeAll { ($0.bundleIdentifier ?? "") == bundleIdentifier }
     }
 
     func setApps(_ apps: [AppProcess]) {

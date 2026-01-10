@@ -36,7 +36,7 @@ final class MenuBarWindowViewTests: XCTestCase {
         _ = view.body
     }
 
-    func testMenuBarWindowViewWithEmptyAppList() {
+    func testMenuBarWindowViewWithEmptyAppList() async {
         let appLister = MockAppLister()
         let appManager = AppProcessManager(appLister: appLister)
         let powerController = PowerAssertionController(powerProvider: MockPowerProvider())
@@ -149,7 +149,7 @@ final class MenuBarWindowViewTests: XCTestCase {
 
     // MARK: - Integration Tests
 
-    func testMenuBarWindowViewWithCaffeinateSection() {
+    func testMenuBarWindowViewWithCaffeinateSection() async {
         let appLister = MockAppLister()
         let appManager = AppProcessManager(appLister: appLister)
         let powerController = PowerAssertionController(powerProvider: MockPowerProvider())

@@ -13,6 +13,27 @@ import XCTest
 @MainActor
 final class MenuBarStateTests: XCTestCase {
 
+    // MARK: - Setup & Teardown
+
+    override func tearDown() {
+        // Reset all shared state after each test to ensure test isolation
+        let state = MenuBarState.shared
+        state.cpuPercentage = 0
+        state.ramUsed = 0
+        state.ramTotal = 0
+        state.storageUsed = 0
+        state.storageTotal = 0
+        state.downloadBPS = 0
+        state.uploadBPS = 0
+        state.temperature = 0
+        state.conditionCode = 0
+        state.sfSymbolName = "sun.max.fill"
+        state.ramPressure = "Normal"
+        state.caffeinateState = .inactive
+        state.powerController = nil
+        super.tearDown()
+    }
+
     // MARK: - Singleton
 
     func testSharedInstanceExists() {
@@ -79,9 +100,6 @@ final class MenuBarStateTests: XCTestCase {
         let state = MenuBarState.shared
         state.cpuPercentage = 75.5
         XCTAssertEqual(state.cpuPercentage, 75.5)
-
-        // Reset for other tests
-        state.cpuPercentage = 0
     }
 
     func testCanUpdateRAMValues() {
@@ -90,10 +108,6 @@ final class MenuBarStateTests: XCTestCase {
         state.ramTotal = 16_000_000_000
         XCTAssertEqual(state.ramUsed, 8_000_000_000)
         XCTAssertEqual(state.ramTotal, 16_000_000_000)
-
-        // Reset
-        state.ramUsed = 0
-        state.ramTotal = 0
     }
 
     func testCanUpdateStorageValues() {
@@ -102,10 +116,6 @@ final class MenuBarStateTests: XCTestCase {
         state.storageTotal = 500_000_000_000
         XCTAssertEqual(state.storageUsed, 250_000_000_000)
         XCTAssertEqual(state.storageTotal, 500_000_000_000)
-
-        // Reset
-        state.storageUsed = 0
-        state.storageTotal = 0
     }
 
     func testCanUpdateWeather() {
@@ -116,11 +126,6 @@ final class MenuBarStateTests: XCTestCase {
         XCTAssertEqual(state.temperature, 28)
         XCTAssertEqual(state.conditionCode, 1)
         XCTAssertEqual(state.sfSymbolName, "cloud.sun.fill")
-
-        // Reset
-        state.temperature = 0
-        state.conditionCode = 0
-        state.sfSymbolName = "sun.max.fill"
     }
 
     func testCanUpdateNetworkSpeeds() {
@@ -129,19 +134,12 @@ final class MenuBarStateTests: XCTestCase {
         state.uploadBPS = 500_000
         XCTAssertEqual(state.downloadBPS, 1_000_000)
         XCTAssertEqual(state.uploadBPS, 500_000)
-
-        // Reset
-        state.downloadBPS = 0
-        state.uploadBPS = 0
     }
 
     func testCanUpdateRAMPressure() {
         let state = MenuBarState.shared
         state.ramPressure = "High"
         XCTAssertEqual(state.ramPressure, "High")
-
-        // Reset
-        state.ramPressure = "Normal"
     }
 
     // MARK: - Caffeinate State
@@ -166,18 +164,12 @@ final class MenuBarStateTests: XCTestCase {
         } else {
             XCTFail("State should be active")
         }
-
-        // Reset
-        state.caffeinateState = .inactive
     }
 
     func testCanUpdateCaffeinateStateToIndefinite() {
         let state = MenuBarState.shared
         state.caffeinateState = .indefinite
         XCTAssertEqual(state.caffeinateState, .indefinite)
-
-        // Reset
-        state.caffeinateState = .inactive
     }
 
     func testInitialPowerController() {
@@ -197,9 +189,6 @@ final class MenuBarStateTests: XCTestCase {
         let controller = PowerAssertionController(powerProvider: provider)
         state.setPowerController(controller)
         XCTAssertNotNil(state.powerController)
-
-        // Reset
-        state.powerController = nil
     }
 
     func testCaffeinateStateIsActive() {
@@ -216,9 +205,6 @@ final class MenuBarStateTests: XCTestCase {
         // Indefinite should be active
         state.caffeinateState = .indefinite
         XCTAssertTrue(state.caffeinateState.isActive)
-
-        // Reset
-        state.caffeinateState = .inactive
     }
 
     func testCaffeinateStateIsIndefinite() {
@@ -235,9 +221,6 @@ final class MenuBarStateTests: XCTestCase {
         // Indefinite is indefinite
         state.caffeinateState = .indefinite
         XCTAssertTrue(state.caffeinateState.isIndefinite)
-
-        // Reset
-        state.caffeinateState = .inactive
     }
 
     func testCaffeinateStateEquality() {
